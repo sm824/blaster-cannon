@@ -4,9 +4,10 @@ class Cannon {
      * color1 = the color for the body of this cannon
      * color2 = the color for the barrel of this cannon
      */
-    constructor(pos, color1, color2) {
+    constructor(pos, color1, color2, speed) {
       this.pos = pos;
       this.colors = [color1, color2];
+      this.speed = speed;
   
       // The attribute rotation uses degrees, and tracks the cannon's rotation
       this.rotation = 0;
@@ -32,7 +33,7 @@ class Cannon {
      * Creates a new bullet, fired from the cannon
      */
     fire() {
-      this.bullets.push(new Bullet(this.pos.copy(), this.rotation));
+      this.bullets.push(new Bullet(this.pos.copy(), this.rotation, this.speed));
     }
   
     /**

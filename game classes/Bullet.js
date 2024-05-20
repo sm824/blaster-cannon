@@ -7,15 +7,16 @@ class Bullet {
      * angle = the angle in degrees that the bullet will
      *         move
      */
-    constructor(startingBulletPosition, angle) {
+    constructor(startingBulletPosition, angle, speed) {
       this.bulletPosition = startingBulletPosition;
       this.angle = angle;
       this.diameter = 5;
   
       this.isOffScreen = false;
+      this.speed = speed;
   
       // Moves the bullet to the tip of the cannon
-      this.advance(40);
+      this.advance(this.speed);
     }
   
     /**
