@@ -12,6 +12,7 @@ class Cannon {
       this.rotation = 0;
   
       this.bullets = [];
+      this.isVisible = true;
     }
   
     /**
@@ -61,6 +62,11 @@ class Cannon {
      * the Cannon object to operate
      */
     operateCannon() {
+      push();
+
+      angleMode(DEGREES);
+      rectMode(CENTER);
+
       this.aim();
       this.display();
   
@@ -84,6 +90,8 @@ class Cannon {
           this.bullets.splice(thisBullet, 1);
         }
       }
+
+      pop();
     }
   }
   

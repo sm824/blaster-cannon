@@ -12,6 +12,14 @@ const WALL_PADDING = 150;
 
 let wallAnchors;
 let canvas;
+let player;
+
+function keyTyped() {
+    // 70 = "F" key
+    if (keyCode == 70) {
+        player.fire();
+    }
+}
 
 function setup() {
     canvas = createCanvas(...DIMENSIONS);
@@ -23,6 +31,13 @@ function setup() {
     };
 
     fill("#586161");
+
+    // Spawns the cannon
+    player = new Cannon(
+        new p5.Vector(width / 2, height / 2),
+        "#B2A79A",
+        "#616161",
+    );
 }
 
 function draw() {
@@ -36,6 +51,9 @@ function draw() {
             WALL_PADDING, DIMENSIONS[1]
         );
     }
+
+    // Maintains the player's cannon character
+    player.operateCannon();
 
     // Keeps the game canvas centered on the webpage
     // Source: https://editor.p5js.org/jm8785/sketches/r0DMO5Mqj
