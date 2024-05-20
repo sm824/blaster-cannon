@@ -7,18 +7,38 @@ Title: Blaster Cannon - Bane of the Cybirds
 Purpose: Runs a game in which the user plays as a cannon able to leap
          from walls, in which they must shoot down cyborg bird enemies
 *********************************************************************/
-DIMENSIONS = [800, 920];
+const DIMENSIONS = [800, 920];
+const WALL_PADDING = 150;
 
+let wallAnchors;
 let canvas;
 
 function setup() {
     canvas = createCanvas(...DIMENSIONS);
 
-    console.log("Hello world!");
+    // Calculates the positions (which lie in the top left of the rect) of each wall
+    wallAnchors = {
+        left: new p5.Vector(0, 0),
+        right: new p5.Vector(DIMENSIONS[0] - WALL_PADDING, 0)
+    };
+
+    fill("#586161");
 }
 
 function draw() {
-    background(220);
+    background(200);
+
+    // Draws the left wall
+    rect(
+        wallAnchors.left.x, wallAnchors.left.y,
+        WALL_PADDING, DIMENSIONS[1]
+    );
+
+    // Draws the right wall
+    rect(
+        wallAnchors.right.x, wallAnchors.right.y,
+        WALL_PADDING, DIMENSIONS[1]
+    );
 
     // Keeps the game canvas centered on the webpage
     // Source: https://editor.p5js.org/jm8785/sketches/r0DMO5Mqj
