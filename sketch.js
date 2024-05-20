@@ -28,17 +28,14 @@ function setup() {
 function draw() {
     background(200);
 
-    // Draws the left wall
-    rect(
-        wallAnchors.left.x, wallAnchors.left.y,
-        WALL_PADDING, DIMENSIONS[1]
-    );
-
-    // Draws the right wall
-    rect(
-        wallAnchors.right.x, wallAnchors.right.y,
-        WALL_PADDING, DIMENSIONS[1]
-    );
+    // Draws the walls
+    // Source: https://flexiple.com/javascript/loop-through-object-javascript
+    for (let [thisKey, thisWall] of Object.entries(wallAnchors)) {
+        rect(
+            thisWall.x, thisWall.y,
+            WALL_PADDING, DIMENSIONS[1]
+        );
+    }
 
     // Keeps the game canvas centered on the webpage
     // Source: https://editor.p5js.org/jm8785/sketches/r0DMO5Mqj
