@@ -1,13 +1,20 @@
+/*********************************************************************
+The class for the cannon character, controlled by the user. All the
+code for the behaviour of the character is found in this file, and is
+run from the draw() loop of sketch.js by the method
+this.operateCannon(), with the exception of its firing and jumping
+events, which are found in keyTyped() of sketch.js
+*********************************************************************/
+
 class Cannon {
     /**
      * pos = the p5.Vector position of this cannon
      * color1 = the color for the body of this cannon
      * color2 = the color for the barrel of this cannon
      */
-    constructor(pos, color1, color2, speed) {
+    constructor(pos, color1, color2) {
       this.pos = pos;
       this.colors = [color1, color2];
-      this.speed = speed;
   
       // The attribute rotation uses degrees, and tracks the cannon's rotation
       this.rotation = 0;
@@ -33,7 +40,7 @@ class Cannon {
      * Creates a new bullet, fired from the cannon
      */
     fire() {
-      this.bullets.push(new Bullet(this.pos.copy(), this.rotation, this.speed));
+      this.bullets.push(new Bullet(this.pos.copy(), this.rotation));
     }
   
     /**
@@ -80,8 +87,8 @@ class Cannon {
   
         fill("black");
         circle(
-          this.bullets[thisBullet].bulletPosition.x,
-          this.bullets[thisBullet].bulletPosition.y,
+          this.bullets[thisBullet].pos.x,
+          this.bullets[thisBullet].pos.y,
           this.bullets[thisBullet].diameter
         );
   

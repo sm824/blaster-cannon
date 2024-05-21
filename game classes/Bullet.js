@@ -1,38 +1,27 @@
+/*********************************************************************
+The class for the bullet objects fired by the cannon. These are
+stored in the Cannon.bullets attribute of the player's cannon, and are
+updated in a loop found in draw() of sketch.js
+*********************************************************************/
+
 class Bullet {
     /**
      * Sets initial attributes.
      *
      * startingBulletPosition = the starting bulletPositionition of the bullet,
-     *               from which it will fly
+     *                          from which it will fly
      * angle = the angle in degrees that the bullet will
      *         move
      */
-    constructor(startingBulletPosition, angle, speed) {
-      this.bulletPosition = startingBulletPosition;
+    constructor(startingBulletPosition, angle) {
+      this.pos = startingBulletPosition;
       this.angle = angle;
       this.diameter = 5;
   
       this.isOffScreen = false;
-      this.speed = speed;
   
       // Moves the bullet to the tip of the cannon
-      this.advance(this.speed);
-    }
-  
-    /**
-     * Moves the bullet forwards, by the number of pixels
-     * given, in the direction specified by its angle
-     * attribute.
-     *
-     * distance = the distance in pixels which the bullet
-     *            moves
-     */
-    advance(distance) {
-      // Offsets the angle by 90, and converts it to radians
-      this.bulletPosition.x +=
-        distance * Math.cos((this.angle + 90) * (PI / 180));
-      this.bulletPosition.y +=
-        distance * Math.sin((this.angle + 90) * (PI / 180));
+      advance(this.pos, 40, this.angle);
     }
   
     /**
@@ -42,14 +31,14 @@ class Bullet {
      */
     monitor() {
       // Moves the bullet
-      this.advance(5);
+      advance(this.pos, SPEED, this.angle);
   
       // Determines if the bullet has gone off-screen
       if (
-        this.bulletPosition.x < 0 ||
-        this.bulletPosition.x > width ||
-        this.bulletPosition.y < 0 ||
-        this.bulletPosition.y > height
+        this.pos.x < 0 ||
+        this.pos.x > width ||
+        this.pos.y < 0 ||
+        this.pos.y > height
       ) {
         this.isOffScreen = true;
       }

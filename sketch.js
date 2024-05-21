@@ -9,7 +9,6 @@ Purpose: Runs a game in which the user plays as a cannon able to leap
 *********************************************************************/
 const DIMENSIONS = [800, 920];
 const WALL_PADDING = 150;
-const SPEED = 40;  // Controls the speed of moving objects in the game
 
 let wallAnchors;
 let canvas;
@@ -37,8 +36,7 @@ function setup() {
     player = new Cannon(
         new p5.Vector(width / 2, height / 2),
         "#B2A79A",
-        "#616161",
-        SPEED
+        "#616161"
     );
 }
 
