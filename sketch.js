@@ -40,6 +40,10 @@ function setup() {
         "#B2A79A",
         "#616161"
     );
+
+    // Sends the player to one side horizontally, chosen randomly
+    player.jumpingAngle = [90, 270][Math.floor(random(0, 2))];
+    player.isJumping = true;
 }
 
 function draw() {

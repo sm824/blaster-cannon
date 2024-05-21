@@ -24,6 +24,7 @@ class Cannon {
 
     this.isJumping = false;
     this.jumpingAngle;
+    this.ignoreWallSteps = 0;
   }
 
   /**
@@ -47,14 +48,20 @@ class Cannon {
   }
 
   /**
-   * Begins the cannon's jump, only if it is not
-   * jumping already
+   * Begins the cannon's jump, only if it
+   * permitted to jump in its current state
    */
-  jump() {
+  jump () {
 
-    if (!this. isJumping) {
+    if (!this.isJumping &&
+      (this.pos.x < width / 2 && this.rotation > 180 ||  // Left wall
+        this.pos.x > width / 2 && this.rotation < 180  // Right wall
+      )) {
       this.isJumping = true;
       this.jumpingAngle = this.rotation;
+
+      // Sets the cannon to ignore collisions with walls for 2 frames
+      this.ignoreWallSteps = 2;
     }
   }
 
@@ -99,12 +106,20 @@ class Cannon {
       // Moves the cannon
       advance(this.pos, SPEED, this.jumpingAngle);
 
-      // Checks if the cannon has met a wall, and stops it
-      if (this.pos.x < WALL_PADDING ||
+      // Checks if the cannon has met a wall after its collision
+      // invulnerability is up, and stops it
+      if (this.ignoreWallSteps == 0 &&
+        (this.pos.x < WALL_PADDING ||
         this.pos.x > DIMENSIONS[0] - WALL_PADDING
-      ) {
+      )) {
         this.isJumping = false;
       }
+    }
+
+    // Decrements the number of frames that the cannon ignores impacts
+    // after jumping
+    if (this.ignoreWallSteps > 0) {
+      this.ignoreWallSteps--; 
     }
 
     // Monitors the bullets
