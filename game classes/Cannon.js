@@ -21,6 +21,9 @@ class Cannon {
 
     this.bullets = [];
     this.isVisible = true;
+
+    this.isJumping = false;
+    this.jumpingAngle;
   }
 
   /**
@@ -29,9 +32,9 @@ class Cannon {
    */
   aim() {
     this.rotation =
-      Math.atan((mouseY - height / 2) / (mouseX - width / 2)) / (PI / 180) + 90;
+      Math.atan((mouseY - this.pos.y) / (mouseX - this.pos.x)) / (PI / 180) + 90;
 
-    if (mouseX >= width / 2) {
+    if (mouseX >= this.pos.x) {
       this.rotation += 180;
     }
   }
@@ -41,6 +44,18 @@ class Cannon {
    */
   fire() {
     this.bullets.push(new Bullet(this.pos.copy(), this.rotation));
+  }
+
+  /**
+   * Begins the cannon's jump, only if it is not
+   * jumping already
+   */
+  jump() {
+
+    if (!this. isJumping) {
+      this.isJumping = true;
+      this.jumpingAngle = this.rotation;
+    }
   }
 
   /**
@@ -77,6 +92,20 @@ class Cannon {
 
     this.aim();
     this.display();
+
+    // Runs the cannon's jump actions, if jumping
+    if (this.isJumping) {
+
+      // Moves the cannon
+      advance(this.pos, SPEED, this.jumpingAngle);
+
+      // Checks if the cannon has met a wall, and stops it
+      if (this.pos.x < WALL_PADDING ||
+        this.pos.x > DIMENSIONS[0] - WALL_PADDING
+      ) {
+        this.isJumping = false;
+      }
+    }
 
     // Monitors the bullets
     for (let thisBullet = 0; thisBullet < this.bullets.length; thisBullet++) {

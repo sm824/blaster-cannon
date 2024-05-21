@@ -7,9 +7,6 @@ Title: Blaster Cannon - Bane of the Cybirds
 Purpose: Runs a game in which the user plays as a cannon able to leap
          from walls, in which they must shoot down cyborg bird enemies
 *********************************************************************/
-const DIMENSIONS = [800, 920];
-const WALL_PADDING = 150;
-
 let wallAnchors;
 let canvas;
 let player;
@@ -18,6 +15,11 @@ function keyTyped() {
     // 70 = "F" key
     if (keyCode == 70) {
         player.fire();
+    }
+
+    // 32 = "Space" key
+    else if (keyCode == 32) {
+        player.jump();
     }
 }
 
