@@ -7,7 +7,8 @@ Title: Blaster Cannon - Bane of the Cybirds
 Purpose: Runs a game in which the user plays as a cannon able to leap
          from walls, in which they must shoot down cyborg bird enemies
 *********************************************************************/
-let wallAnchors;
+const WALL_STRIPES = 10;
+
 let canvas;
 let player;
 
@@ -33,6 +34,8 @@ function setup() {
     };
 
     fill("#586161");
+    playerScore = 0;
+    cameraY = 0;
 
     // Spawns the cannon
     player = new Cannon(
@@ -49,17 +52,48 @@ function setup() {
 function draw() {
     background(200);
 
-    // Draws the walls
-    // Source: https://flexiple.com/javascript/loop-through-object-javascript
-    for (let [thisKey, thisWall] of Object.entries(wallAnchors)) {
+    // Draws the walls (right, then left)
+    for (let thisWall = 0; thisWall < 2; thisWall++) {
+
+        // Base walls
         rect(
-            thisWall.x, thisWall.y,
-            WALL_PADDING, DIMENSIONS[1]
+            (width - WALL_PADDING) * thisWall,
+            0,
+            WALL_PADDING,
+            height
         );
+
+        push();
+        fill("#792127");
+
+        // Draws the wall patterns
+        for (let thisBar = 0; thisBar < WALL_STRIPES + 1; thisBar++) {
+            rect(
+                (width - WALL_PADDING) * thisWall,
+                thisBar * (height / WALL_STRIPES) + cameraY % (height / WALL_STRIPES),
+                WALL_PADDING,
+                10
+            );
+        }
+
+        pop();
     }
+
+    push();
+    translate(0, cameraY);
 
     // Maintains the player's cannon character
     player.operateCannon();
+
+    // Tracks the cannon position and player's score
+    if (player.pos.y - height / 2 < playerScore) {
+        cameraY = player.pos.y - height / 2;
+        playerScore = -cameraY;
+
+        console.log("New score: " + playerScore);
+    }
+
+    pop();
 
     // Keeps the game canvas centered on the webpage
     // Source: https://editor.p5js.org/jm8785/sketches/r0DMO5Mqj
