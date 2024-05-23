@@ -3,6 +3,9 @@ const SPEED = 5;  // The moving speed of the characters in the game
 const WALL_PADDING = 150;  // The thickness in pixels of the side wall
 const DIMENSIONS = [800, 920];  // The width and weight of the canvas respectively
 
+let playerScore;
+let cameraY;
+
 /**
      * Moves the position a distance, by the number of pixels
      * given, in the direction of the fiven angle (degreed)
