@@ -33,7 +33,7 @@ class Cannon {
    */
   aim() {
     this.rotation =
-      Math.atan((mouseY - this.pos.y) / (mouseX - this.pos.x)) / (PI / 180) + 90;
+      Math.atan((mouseY + cameraY - this.pos.y) / (mouseX - this.pos.x)) / (PI / 180) + 90;
 
     if (mouseX >= this.pos.x) {
       this.rotation += 180;
@@ -51,7 +51,7 @@ class Cannon {
    * Begins the cannon's jump, only if it
    * permitted to jump in its current state
    */
-  jump () {
+  jump() {
 
     if (!this.isJumping &&
       (this.pos.x < width / 2 && this.rotation > 180 ||  // Left wall
@@ -73,6 +73,7 @@ class Cannon {
     push();
 
     translate(this.pos.x, this.pos.y);
+    translateToScreen();
     rotate(this.rotation);
 
     fill("grey");
@@ -104,14 +105,31 @@ class Cannon {
     if (this.isJumping) {
 
       // Moves the cannon
-      advance(this.pos, SPEED, this.jumpingAngle);
+      if (this.pos.y < cameraY + height) {
+        advance(this.pos, SPEED, this.jumpingAngle);
+      }
+      
+      // Deflects the cannon off the bottom of the screen
+      else {
+
+        // Moves the player back slightly, so the end is not detected again
+        this.pos.y -= SPEED;
+
+        // Determines the direction to deflect the player
+        if (this.jumpingAngle < 180) {  // Left
+          this.jumpingAngle = 90;
+        }
+        else {  // Right
+          this.jumpingAngle = 270;
+        }
+      }
 
       // Checks if the cannon has met a wall after its collision
       // invulnerability is up, and stops it
       if (this.ignoreWallSteps == 0 &&
         (this.pos.x < WALL_PADDING ||
-        this.pos.x > DIMENSIONS[0] - WALL_PADDING
-      )) {
+          this.pos.x > DIMENSIONS[0] - WALL_PADDING
+        )) {
         this.isJumping = false;
       }
     }
@@ -119,7 +137,7 @@ class Cannon {
     // Decrements the number of frames that the cannon ignores impacts
     // after jumping
     if (this.ignoreWallSteps > 0) {
-      this.ignoreWallSteps--; 
+      this.ignoreWallSteps--;
     }
 
     // Monitors the bullets
@@ -132,7 +150,7 @@ class Cannon {
       fill("black");
       circle(
         this.bullets[thisBullet].pos.x,
-        this.bullets[thisBullet].pos.y,
+        this.bullets[thisBullet].pos.y - cameraY * 2,
         this.bullets[thisBullet].diameter
       );
 

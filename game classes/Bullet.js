@@ -37,8 +37,8 @@ class Bullet {
     if (
       this.pos.x < 0 ||
       this.pos.x > width ||
-      this.pos.y < 0 ||
-      this.pos.y > height
+      this.pos.y < cameraY ||
+      this.pos.y > height + cameraY
     ) {
       this.isOffScreen = true;
     }

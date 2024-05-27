@@ -70,7 +70,7 @@ function draw() {
         for (let thisBar = 0; thisBar < WALL_STRIPES + 1; thisBar++) {
             rect(
                 (width - WALL_PADDING) * thisWall,
-                thisBar * (height / WALL_STRIPES) + cameraY % (height / WALL_STRIPES),
+                height - (thisBar * (height / WALL_STRIPES) + cameraY % (height / WALL_STRIPES)),
                 WALL_PADDING,
                 10
             );
@@ -86,11 +86,9 @@ function draw() {
     player.operateCannon();
 
     // Tracks the cannon position and player's score
-    if (player.pos.y - height / 2 < playerScore) {
+    if (player.pos.y - height / 2 < cameraY) {
         cameraY = player.pos.y - height / 2;
         playerScore = -cameraY;
-
-        console.log("New score: " + playerScore);
     }
 
     pop();
