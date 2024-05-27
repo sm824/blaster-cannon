@@ -56,6 +56,10 @@ function draw() {
     for (let thisWall = 0; thisWall < 2; thisWall++) {
 
         // Base walls
+    // Draws the walls (right, then left)
+    for (let thisWall = 0; thisWall < 2; thisWall++) {
+
+        // Base walls
         rect(
             (width - WALL_PADDING) * thisWall,
             0,
@@ -81,9 +85,43 @@ function draw() {
 
     push();
     translate(0, cameraY);
+            (width - WALL_PADDING) * thisWall,
+            0,
+            WALL_PADDING,
+            height
+        );
+
+        push();
+        fill("#792127");
+
+        // Draws the wall patterns
+        for (let thisBar = 0; thisBar < WALL_STRIPES + 1; thisBar++) {
+            rect(
+                (width - WALL_PADDING) * thisWall,
+                thisBar * (height / WALL_STRIPES) + cameraY % (height / WALL_STRIPES),
+                WALL_PADDING,
+                10
+            );
+        }
+
+        pop();
+    }
+
+    push();
+    translate(0, cameraY);
 
     // Maintains the player's cannon character
     player.operateCannon();
+
+    // Tracks the cannon position and player's score
+    if (player.pos.y - height / 2 < playerScore) {
+        cameraY = player.pos.y - height / 2;
+        playerScore = -cameraY;
+
+        console.log("New score: " + playerScore);
+    }
+
+    pop();
 
     // Tracks the cannon position and player's score
     if (player.pos.y - height / 2 < cameraY) {
