@@ -25,6 +25,7 @@ class Cannon {
     this.isJumping = false;
     this.jumpingAngle;
     this.ignoreWallSteps = 0;
+    this.health = 5;
   }
 
   /**

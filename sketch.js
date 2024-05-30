@@ -9,8 +9,23 @@ Purpose: Runs a game in which the user plays as a cannon able to leap
 *********************************************************************/
 const WALL_STRIPES = 10;
 
+const HEALTH_BAR_ROUNDNESS = 10;
+const HEALTH_COLORS = [
+    "#b6c7d4",
+    "#a3a3a3",
+    "#c4a991",
+    "#d98366",
+    "#d63333"
+];
+
 let canvas;
 let player;
+let gameFont;
+
+function preload() {
+    // Font Source: https://fonts.google.com/specimen/Orbitron?preview.text=Health
+    gameFont = loadFont("media/OrbitronFont.ttf");
+}
 
 function keyTyped() {
     // 70 = "F" key
@@ -34,6 +49,9 @@ function setup() {
     };
 
     fill("#586161");
+    textFont(gameFont);
+    textSize(25);
+
     playerScore = 0;
     cameraY = 0;
 
@@ -56,10 +74,6 @@ function draw() {
     for (let thisWall = 0; thisWall < 2; thisWall++) {
 
         // Base walls
-    // Draws the walls (right, then left)
-    for (let thisWall = 0; thisWall < 2; thisWall++) {
-
-        // Base walls
         rect(
             (width - WALL_PADDING) * thisWall,
             0,
@@ -68,7 +82,7 @@ function draw() {
         );
 
         push();
-        fill("#792127");
+        fill(THEME_COLOR);
 
         // Draws the wall patterns
         for (let thisBar = 0; thisBar < WALL_STRIPES + 1; thisBar++) {
@@ -85,49 +99,39 @@ function draw() {
 
     push();
     translate(0, cameraY);
-            (width - WALL_PADDING) * thisWall,
-            0,
-            WALL_PADDING,
-            height
-        );
-
-        push();
-        fill("#792127");
-
-        // Draws the wall patterns
-        for (let thisBar = 0; thisBar < WALL_STRIPES + 1; thisBar++) {
-            rect(
-                (width - WALL_PADDING) * thisWall,
-                thisBar * (height / WALL_STRIPES) + cameraY % (height / WALL_STRIPES),
-                WALL_PADDING,
-                10
-            );
-        }
-
-        pop();
-    }
-
-    push();
-    translate(0, cameraY);
 
     // Maintains the player's cannon character
     player.operateCannon();
-
-    // Tracks the cannon position and player's score
-    if (player.pos.y - height / 2 < playerScore) {
-        cameraY = player.pos.y - height / 2;
-        playerScore = -cameraY;
-
-        console.log("New score: " + playerScore);
-    }
-
-    pop();
 
     // Tracks the cannon position and player's score
     if (player.pos.y - height / 2 < cameraY) {
         cameraY = player.pos.y - height / 2;
         playerScore = -cameraY;
     }
+
+    // Draws overlays containing the player's stats
+    translate(0, -cameraY);
+
+    // Draws the base shapes of the overlays
+    fill(...THEME_COLOR, 220);
+    rect(0, 0, 300, 100);  // Overlay BG
+    fill("grey");
+    rect(150, 45, 145, 50);  // Advance value BG
+
+    // Draws the labels and values
+    fill("black");
+    text("Advance   " + Math.floor(playerScore), 10, 80);  // Advance label and value
+    text("Health", 10, 35);  // Health text label
+
+    // Draws the health bar
+    rect(120, 10, 175, 25, HEALTH_BAR_ROUNDNESS);  // Health bar BG (empty health)
+    fill(HEALTH_COLORS[HEALTH_COLORS.length - player.health]);
+    rect(120, 10, 175 / 5 * player.health, 25, HEALTH_BAR_ROUNDNESS);
+
+    // Writes the value of the health bar
+    fill("black");
+    textSize(15);
+    text(player.health + " / 5", 185, 28.5);
 
     pop();
 

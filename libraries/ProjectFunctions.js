@@ -2,6 +2,7 @@
 const SPEED = 5;  // The moving speed of the characters in the game
 const WALL_PADDING = 150;  // The thickness in pixels of the side wall
 const DIMENSIONS = [800, 920];  // The width and weight of the canvas respectively
+const THEME_COLOR = [121, 33, 39];
 
 let playerScore;
 let cameraY;
