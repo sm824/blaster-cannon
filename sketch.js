@@ -9,6 +9,7 @@ Purpose: Runs a game in which the user plays as a cannon able to leap
 *********************************************************************/
 const WALL_STRIPES = 10;
 
+const UI_SCALE = 1;
 const HEALTH_BAR_ROUNDNESS = 10;
 const HEALTH_COLORS = [
     "#b6c7d4",
@@ -50,7 +51,7 @@ function setup() {
 
     fill("#586161");
     textFont(gameFont);
-    textSize(25);
+    textSize(25 * UI_SCALE);
 
     playerScore = 0;
     cameraY = 0;
@@ -114,24 +115,46 @@ function draw() {
 
     // Draws the base shapes of the overlays
     fill(...THEME_COLOR, 220);
-    rect(0, 0, 300, 100);  // Overlay BG
+    rect(0, 0, 300 * UI_SCALE, 100 * UI_SCALE);  // Overlay background
     fill("grey");
-    rect(150, 45, 145, 50);  // Advance value BG
+
+    // Advance value background
+    rect(
+        150 * UI_SCALE,
+        45 * UI_SCALE,
+        145 * UI_SCALE,
+        50 * UI_SCALE
+    );
 
     // Draws the labels and values
     fill("black");
-    text("Advance   " + Math.floor(playerScore), 10, 80);  // Advance label and value
-    text("Health", 10, 35);  // Health text label
+    text("Advance   " + Math.floor(playerScore), 10 * UI_SCALE, 80 * UI_SCALE);  // Advance label and value
+    text("Health", 10 * UI_SCALE, 35 * UI_SCALE);  // Health text label
 
     // Draws the health bar
-    rect(120, 10, 175, 25, HEALTH_BAR_ROUNDNESS);  // Health bar BG (empty health)
-    fill(HEALTH_COLORS[HEALTH_COLORS.length - player.health]);
-    rect(120, 10, 175 / 5 * player.health, 25, HEALTH_BAR_ROUNDNESS);
+    // Health bar background (empty health)
+    rect(
+        120 * UI_SCALE,
+        10 * UI_SCALE,
+        175 * UI_SCALE,
+        25 * UI_SCALE,
+        HEALTH_BAR_ROUNDNESS * UI_SCALE
+    );
+
+    // Health bar full area
+    fill(HEALTH_COLORS[HEALTH_COLORS.length - player.health]);  // Sets the health bar to a color based off its value
+    rect(
+        120 * UI_SCALE,
+        10 * UI_SCALE,
+        175 / 5 * player.health * UI_SCALE,
+        25 * UI_SCALE,
+        HEALTH_BAR_ROUNDNESS * UI_SCALE
+    );
 
     // Writes the value of the health bar
-    fill("black");
-    textSize(15);
-    text(player.health + " / 5", 185, 28.5);
+    fill(THEME_COLOR);
+    textSize(15 * UI_SCALE);
+    text(player.health + " / 5", 185 * UI_SCALE, 28.5 * UI_SCALE);
 
     pop();
 
