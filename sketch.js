@@ -8,6 +8,10 @@ Purpose: Runs a game in which the user plays as a cannon able to leap
          from walls, in which they must shoot down cyborg bird enemies
 *********************************************************************/
 const WALL_STRIPES = 10;
+const CYBIRD_ADVANCE_Y = -800;  // How far (pixels) the cybirds spawn ahead
+const CYBIRD_WALL_DISTANCE = 50;  // The minumum distance a cybird in the hall must be from the wall (before it comes to a player)
+const CYBIRD_SPAWN_FACTOR = 1;  // A factor to control the spawn of cybirds. Higher values = more cybirds overall
+const CYBIRD_SPAWN_Y_VARIANCE = 75;  // Controls the maximum staggering distance of individuals in a cybird flock
 
 const UI_SCALE = 1;
 const HEALTH_BAR_ROUNDNESS = 10;
@@ -22,6 +26,7 @@ const HEALTH_COLORS = [
 let canvas;
 let player;
 let gameFont;
+let cybirds;
 
 function preload() {
     // Font Source: https://fonts.google.com/specimen/Orbitron?preview.text=Health
@@ -53,8 +58,9 @@ function setup() {
     textFont(gameFont);
     textSize(25 * UI_SCALE);
 
-    playerScore = 0;
+    playerAdvance = 0;
     cameraY = 0;
+    cybirds = [];
 
     // Spawns the cannon
     player = new Cannon(
@@ -70,6 +76,44 @@ function setup() {
 
 function draw() {
     background(200);
+
+    // Determines if more cybirds should spawn
+    if (random(600 / CYBIRD_SPAWN_FACTOR) < playerAdvance / 1000) {
+
+        // Determines how many cybirds should spawn in the new flock, at randomized location
+        for (let newBird = 0; newBird < random(1, 4); newBird++) {
+            cybirds.push(new Cybird(new p5.Vector(
+                random(WALL_PADDING + CYBIRD_WALL_DISTANCE, width - WALL_PADDING - CYBIRD_WALL_DISTANCE),
+                random(CYBIRD_ADVANCE_Y) - CYBIRD_SPAWN_Y_VARIANCE + cameraY * 1.5 + random(CYBIRD_SPAWN_Y_VARIANCE)
+            )));
+        }
+    }
+
+    // Operates the cybirds on the canvas
+    for (let thisBird = 0; thisBird < cybirds.length; thisBird++) {
+        cybirds[thisBird].run();
+
+        cybirds[thisBird].displayHitbox();
+
+        for (let thisBullet = 0; thisBullet < player.bullets.length; thisBullet++) {
+            
+            // Checks if the current bullet has met the cuurrent cybird's hitbox
+            if (player.bullets[thisBullet].pos.x > cybirds[thisBird].pos.x - CYBIRD_HITBOX_SIZE / 2 &&
+                player.bullets[thisBullet].pos.x < cybirds[thisBird].pos.x + CYBIRD_HITBOX_SIZE / 2 &&
+                player.bullets[thisBullet].pos.y > cybirds[thisBird].pos.y - CYBIRD_HITBOX_SIZE / 2 &&
+                player.bullets[thisBullet].pos.y < cybirds[thisBird].pos.y + CYBIRD_HITBOX_SIZE / 2
+            ) {
+                cybirds[thisBird].state = CYBIRD_STATES.dead;  // State 4 marks the cybird as dead
+            }
+        }
+    }
+
+    // Checks for cybirds that were shot above, and deletes them (prevents errors that would occur if they were deleted above)
+    for (let thisBird = 0; thisBird < cybirds.length; thisBird++) {
+        if (cybirds[thisBird].state == CYBIRD_STATES.dead) {
+            cybirds.splice(thisBird, 1);
+        }
+    }
 
     // Draws the walls (right, then left)
     for (let thisWall = 0; thisWall < 2; thisWall++) {
@@ -107,7 +151,7 @@ function draw() {
     // Tracks the cannon position and player's score
     if (player.pos.y - height / 2 < cameraY) {
         cameraY = player.pos.y - height / 2;
-        playerScore = -cameraY;
+        playerAdvance = -cameraY;
     }
 
     // Draws overlays containing the player's stats
@@ -128,7 +172,7 @@ function draw() {
 
     // Draws the labels and values
     fill("black");
-    text("Advance   " + Math.floor(playerScore), 10 * UI_SCALE, 80 * UI_SCALE);  // Advance label and value
+    text("Advance   " + Math.floor(playerAdvance), 10 * UI_SCALE, 80 * UI_SCALE);  // Advance label and value
     text("Health", 10 * UI_SCALE, 35 * UI_SCALE);  // Health text label
 
     // Draws the health bar

@@ -4,7 +4,16 @@ const WALL_PADDING = 150;  // The thickness in pixels of the side wall
 const DIMENSIONS = [800, 920];  // The width and weight of the canvas respectively
 const THEME_COLOR = [121, 33, 39];
 
-let playerScore;
+const CYBIRD_HITBOX_SIZE = 80;
+const CYBIRD_STATES = {
+    patrolling: 0,
+    chasing: 1,
+    orbitting: 2,
+    attacking: 3,
+    dead: 4
+};
+
+let playerAdvance;
 let cameraY;
 
 /**
