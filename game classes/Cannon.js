@@ -25,6 +25,7 @@ class Cannon {
     this.isJumping = false;
     this.jumpingAngle;
     this.ignoreWallSteps = 0;
+    this.bulletCooldown = 0;
     this.health = 5;
   }
 
@@ -45,7 +46,10 @@ class Cannon {
    * Creates a new bullet, fired from the cannon
    */
   fire() {
-    this.bullets.push(new Bullet(this.pos.copy(), this.rotation));
+    if (this.bulletCooldown == 0) {
+      this.bullets.push(new Bullet(this.pos.copy(), this.rotation));
+      this.bulletCooldown = 60;
+    }
   }
 
   /**
@@ -77,6 +81,23 @@ class Cannon {
     translateToScreen();
     rotate(this.rotation);
 
+    // Draws the cooldown indicator on the cannon barrel, if required
+    if (this.bulletCooldown > 0) {
+      push();
+
+      fill(204, 28, 14, 140);
+      noStroke();
+      ellipseMode(CENTER);
+
+      circle(
+        0,
+        42.5,
+        30 * this.bulletCooldown * (1/60)  // Calculates the size of the cooldown circle
+      );
+
+      pop();
+    }
+
     fill("grey");
     circle(0, 0, 50); // Draws the circlular base
 
@@ -102,6 +123,10 @@ class Cannon {
     this.aim();
     this.display();
 
+    if (this.bulletCooldown > 0) {
+      this.bulletCooldown--;
+    }
+
     // Runs the cannon's jump actions, if jumping
     if (this.isJumping) {
 
@@ -109,7 +134,7 @@ class Cannon {
       if (this.pos.y < cameraY + height) {
         advance(this.pos, SPEED, this.jumpingAngle);
       }
-      
+
       // Deflects the cannon off the bottom of the screen
       else {
 

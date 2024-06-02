@@ -159,10 +159,10 @@ function draw() {
 
     // Draws the base shapes of the overlays
     fill(...THEME_COLOR, 220);
-    rect(0, 0, 300 * UI_SCALE, 100 * UI_SCALE);  // Overlay background
+    rect(0, 0, 300 * UI_SCALE, 135 * UI_SCALE);  // Overlay background
     fill("grey");
 
-    // Advance value background
+    // Draws the advance value background
     rect(
         150 * UI_SCALE,
         45 * UI_SCALE,
@@ -175,13 +175,21 @@ function draw() {
     text("Advance   " + Math.floor(playerAdvance), 10 * UI_SCALE, 80 * UI_SCALE);  // Advance label and value
     text("Health", 10 * UI_SCALE, 35 * UI_SCALE);  // Health text label
 
-    // Draws the health bar
     // Health bar background (empty health)
     rect(
         120 * UI_SCALE,
         10 * UI_SCALE,
         175 * UI_SCALE,
         25 * UI_SCALE,
+        HEALTH_BAR_ROUNDNESS * UI_SCALE
+    );
+
+    // Cooldown bar background
+    rect(
+        10 * UI_SCALE,
+        105 * UI_SCALE,
+        280 * UI_SCALE,
+        20 * UI_SCALE,
         HEALTH_BAR_ROUNDNESS * UI_SCALE
     );
 
@@ -199,6 +207,17 @@ function draw() {
     fill(THEME_COLOR);
     textSize(15 * UI_SCALE);
     text(player.health + " / 5", 185 * UI_SCALE, 28.5 * UI_SCALE);
+
+    // Draws the fill of the cooldown bar
+    if (player.bulletCooldown > 0) {
+        rect(
+            10 * UI_SCALE,
+            105 * UI_SCALE,
+            (280 * UI_SCALE)/60 * player.bulletCooldown,
+            20 * UI_SCALE,
+            HEALTH_BAR_ROUNDNESS * UI_SCALE
+        );
+    }
 
     pop();
 
