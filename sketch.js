@@ -24,7 +24,6 @@ const HEALTH_COLORS = [
 ];
 
 let canvas;
-let player;
 let gameFont;
 let cybirds;
 
@@ -92,8 +91,6 @@ function draw() {
     // Operates the cybirds on the canvas
     for (let thisBird = 0; thisBird < cybirds.length; thisBird++) {
         cybirds[thisBird].run();
-
-        cybirds[thisBird].displayHitbox();
 
         for (let thisBullet = 0; thisBullet < player.bullets.length; thisBullet++) {
             

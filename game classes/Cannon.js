@@ -30,19 +30,6 @@ class Cannon {
   }
 
   /**
-   * Updates the cannon's rotation (in degrees)
-   * to point towards the mouse
-   */
-  aim() {
-    this.rotation =
-      Math.atan((mouseY + cameraY - this.pos.y) / (mouseX - this.pos.x)) / (PI / 180) + 90;
-
-    if (mouseX >= this.pos.x) {
-      this.rotation += 180;
-    }
-  }
-
-  /**
    * Creates a new bullet, fired from the cannon
    */
   fire() {
@@ -120,7 +107,7 @@ class Cannon {
     angleMode(DEGREES);
     rectMode(CENTER);
 
-    this.aim();
+    this.rotation = aim(this.pos, new p5.Vector(mouseX, mouseY + cameraY));
     this.display();
 
     if (this.bulletCooldown > 0) {

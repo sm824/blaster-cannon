@@ -171,10 +171,44 @@ class Cybird {
     }
 
     /**
+     * Moves the cybird down the hall at 1/3 the speed of the cannon and
+     * bullets, and watches for the nearby player, to switch the bird's
+     * state to chasing when the player is seen
+     */
+    patrol() {
+        advance(this.pos, SPEED / 3, this.rotation);
+
+        // Monitors for players
+        if (player.isVisible && player.pos.y - this.pos.y < CYBIRD_ORBIT_RANGE + CYBIRD_CHASE_DISTANCE) {
+            this.state = CYBIRD_STATES.chasing;
+        }
+    }
+
+    /**
+     * Runs the operations for the bird to chase the player until it is in orbitting range
+     */
+    chase() {
+        this.rotation = aim(this.pos, player.pos);
+        advance(this.pos, SPEED, this.rotation);  // The cybird cannot go slower than SPEED, or the player could outrun it
+    
+        if (getDistance(player.pos, this.pos) < CYBIRD_ORBIT_RANGE) {
+            this.state = CYBIRD_STATES.orbitting
+        }
+    }
+
+    /**
      * Runs all the necessary operations for the cybird to work
      */
     run() {
         this.animate();
+
+        if (this.state == CYBIRD_STATES.patrolling) {
+            this.patrol();
+        } else if (this.state == CYBIRD_STATES.chasing) {
+            this.chase();
+        } else if (this.state == CYBIRD_STATES.orbitting) {
+            //
+        }
     }
 
 }
