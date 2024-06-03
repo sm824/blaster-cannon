@@ -78,8 +78,6 @@ function setup() {
 function draw() {
     background(200);
 
-    console.log("Cybird spawn block: " + cybirdSpawnBlock);
-
     // Counts down since the last cybird spawn, to prevent
     if (cybirdSpawnBlock > 0) {
         cybirdSpawnBlock--;
@@ -99,12 +97,20 @@ function draw() {
         }
     }
 
+    let tempBirdCount = 0;
+
     // Operates the cybirds on the canvas
     for (let thisBird = 0; thisBird < cybirds.length; thisBird++) {
         cybirds[thisBird].run();
 
+        if (cybirds[thisBird].pos.y < cameraY + height &&
+            cybirds[thisBird].pos.y > cameraY
+        ) {
+            tempBirdCount++;
+        }
+
         for (let thisBullet = 0; thisBullet < player.bullets.length; thisBullet++) {
-            
+
             // Checks if the current bullet has met the cuurrent cybird's hitbox
             if (player.bullets[thisBullet].pos.x > cybirds[thisBird].pos.x - CYBIRD_HITBOX_SIZE / 2 &&
                 player.bullets[thisBullet].pos.x < cybirds[thisBird].pos.x + CYBIRD_HITBOX_SIZE / 2 &&
@@ -115,6 +121,8 @@ function draw() {
             }
         }
     }
+
+    console.log("Birds on screen: " + tempBirdCount);
 
     // Checks for cybirds that were shot above, and deletes them (prevents errors that would occur if they were deleted above)
     for (let thisBird = 0; thisBird < cybirds.length; thisBird++) {
@@ -221,7 +229,7 @@ function draw() {
         rect(
             10 * UI_SCALE,
             105 * UI_SCALE,
-            (280 * UI_SCALE)/60 * player.bulletCooldown,
+            (280 * UI_SCALE) / 60 * player.bulletCooldown,
             20 * UI_SCALE,
             HEALTH_BAR_ROUNDNESS * UI_SCALE
         );

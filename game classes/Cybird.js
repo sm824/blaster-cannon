@@ -7,6 +7,7 @@ as a mechanism to destroy the birds when they're hit. Uses HSL colors
 class Cybird {
 
     isBirdDiving = false;
+    wingDivingRotation = 160;
     birdSize = 0.8;
 
     /**
@@ -27,7 +28,7 @@ class Cybird {
         this.orbitRotation = 0;
         this.orbitDirection = 1;  // +1 for clockwise, -1 for counter-clockwise
         this.pos = pos;
-        this.fleeingPos = NaN;  // Equals NaN when the cybird is not fleeing, and holds a p5.Vector object when it is
+        this.targetPos = NaN;  // Equals NaN when the cybird is not fleeing, and holds a p5.Vector object when it is
 
         // Gets randomized colors for the cybird
         this.color1 = this.getRandomHSL();  // Main body color
@@ -76,24 +77,30 @@ class Cybird {
             this.frame = 0;
         }
 
-        // Runs the bird's animation if it is not attacking
-        if (this.state < CYBIRD_STATES.attacking) {
+        push();
+        angleMode(DEGREES);
+        colorMode(HSL);
 
-            push();
-            angleMode(DEGREES);
-            colorMode(HSL);
+        translate(this.pos.x, this.pos.y - cameraY);
+        rotate(this.rotation);
 
-            translate(this.pos.x, this.pos.y - cameraY);
-            rotate(this.rotation);
+        // Draws the wings (this.color2)
+        fill(this.color2);
 
-            // Draws the wings (this.color2)
-            fill(this.color2);
+        // Runs the bird's wings animation if it is not attacking
+        if (this.state < CYBIRD_STATES.dead) {
 
             // Left wing
             push();
 
             translate(10 * this.birdSize, 10 * this.birdSize);
-            rotate(-50 - Math.abs(this.frame - 30) * 3.5);
+
+            // Determines whether the drawn wing will be animated or stationary (diving)
+            if (this.state < CYBIRD_STATES.attacking) {
+                rotate(-50 - Math.abs(this.frame - 30) * 3.5);
+            } else {
+                rotate(-this.wingDivingRotation);
+            }
 
             triangle(
                 0, 0,
@@ -107,7 +114,13 @@ class Cybird {
             push();
 
             translate(-10 * this.birdSize, 10 * this.birdSize);
-            rotate(50 + Math.abs(this.frame - 30) * 3.5);
+
+            // Determines whether the drawn wing will be animated or stationary (diving)
+            if (this.state < CYBIRD_STATES.attacking) {
+                rotate(50 + Math.abs(this.frame - 30) * 3.5);
+            } else {
+                rotate(this.wingDivingRotation);
+            }
 
             triangle(
                 0, 0,
@@ -116,60 +129,74 @@ class Cybird {
             );
 
             pop();
+        }
 
-            // Draws the rest of the body
+        // Draws the rest of the body
 
-            // Draws the neck (this.color2)
-            rectMode(CENTER);
-            fill(this.color2);
-            rect(
-                0,
-                25 * this.birdSize,
-                10 * this.birdSize,
-                30 * this.birdSize
-            );
+        // Draws the neck (this.color2)
+        rectMode(CENTER);
+        fill(this.color2);
+        rect(
+            0,
+            25 * this.birdSize,
+            10 * this.birdSize,
+            30 * this.birdSize
+        );
 
-            // Draws the tail (this.color2)
-            triangle(
-                0, -10 * this.birdSize,
-                15 * this.birdSize, -40 * this.birdSize,
-                -15 * this.birdSize, -40 * this.birdSize
-            );
+        // Draws the tail (this.color2)
+        triangle(
+            0, -10 * this.birdSize,
+            15 * this.birdSize, -40 * this.birdSize,
+            -15 * this.birdSize, -40 * this.birdSize
+        );
 
-            // Draws the head (this.color1)
-            fill(this.color1);
-            triangle(
-                -10 * this.birdSize, 30 * this.birdSize,
-                0, 55 * this.birdSize,
-                10 * this.birdSize, 30 * this.birdSize
-            );
+        // Draws the head (this.color1)
+        fill(this.color1);
+        triangle(
+            -10 * this.birdSize, 30 * this.birdSize,
+            0, 55 * this.birdSize,
+            10 * this.birdSize, 30 * this.birdSize
+        );
 
-            // Draws the eyes
-            ellipseMode(CENTER);
-            fill("#cf4444");
+        // Draws the eyes
+        ellipseMode(CENTER);
+        fill("#cf4444");
 
-            circle(  // Left eye
-                -8 * this.birdSize,
-                40 * this.birdSize,
-                8 * this.birdSize
-            );
-            circle(  // Right eye
-                8 * this.birdSize,
-                40 * this.birdSize,
-                8 * this.birdSize
-            );
+        circle(  // Left eye
+            -8 * this.birdSize,
+            40 * this.birdSize,
+            8 * this.birdSize
+        );
+        circle(  // Right eye
+            8 * this.birdSize,
+            40 * this.birdSize,
+            8 * this.birdSize
+        );
 
-            // Draws the body (this.color1)
-            fill(this.color1);
-            rect(
-                0,
-                0,
-                35 * this.birdSize,
-                40 * this.birdSize,
-                10 * this.birdSize
-            );
+        // Draws the body (this.color1)
+        fill(this.color1);
+        rect(
+            0,
+            0,
+            35 * this.birdSize,
+            40 * this.birdSize,
+            10 * this.birdSize
+        );
 
-            pop();
+        pop();
+
+    }
+
+    /**
+     * Returns 1 if the cybird is touching/in the left wall, and -1 if it
+     * is in the other. Returns NaN if it touches neither
+     */
+    detectWall() {
+        if (this.pos.x > width - WALL_PADDING) {  // Right wall
+            return -1;
+        }
+        else if (this.pos.x < WALL_PADDING) {  // Left wall
+            return 1;
         }
     }
 
@@ -212,30 +239,30 @@ class Cybird {
         this.rotation = this.orbitRotation + 90 * this.orbitDirection;
 
         // Checks if the cybird has met a wall
-        if (this.pos.x > width - WALL_PADDING || this.pos.x < WALL_PADDING) {
+        if (this.detectWall()) {
             advance(this.pos, 20, -this.rotation);  // Prevents the cybird from getting stuck in a wall
             this.orbitDirection = -this.orbitDirection;
 
             // Checks if the cybird is still in the wall, meaning the player has gotten it stuck during a jump
-            if (this.pos.x > width - WALL_PADDING || this.pos.x < WALL_PADDING) {
-                
+            if (this.detectWall()) {
+
                 this.state = CYBIRD_STATES.fleeing;
 
                 // Finds a position that is away from the player
-                if (player.pos < width/2) {   // Fleeing to the left wall
-                    this.fleeingPos = new p5.Vector(
+                if (player.pos < width / 2) {   // Fleeing to the left wall
+                    this.targetPos = new p5.Vector(
                         width - WALL_PADDING - 100,
-                        cameraY + random(-height/2, height/2)
+                        cameraY + random(0, height)
                     );
                 }
                 else {  // Fleeing to the right wall
-                    this.fleeingPos = new p5.Vector(
+                    this.targetPos = new p5.Vector(
                         WALL_PADDING + 100,
-                        cameraY + random(-height/2, height/2)
+                        cameraY + random(0, height)
                     );
                 }
             }
-    }
+        }
         else {
             this.orbitRotation += this.orbitDirection;  // Orbits the cybird
 
@@ -246,6 +273,12 @@ class Cybird {
                 CYBIRD_ORBIT_RANGE,
                 this.orbitRotation
             );
+        }
+
+        // Checks if the cybird should attack, and sets it to do so
+        if (Math.floor(random(0, 600)) < CYBIRD_ATTACK_PROBABILITY) {
+            this.rotation = aim(this.pos, player.pos);
+            this.state = CYBIRD_STATES.attacking;
         }
     }
 
@@ -258,12 +291,40 @@ class Cybird {
      */
     flee() {
 
-        this.rotation = aim(this.pos, this.fleeingPos);
+        this.rotation = aim(this.pos, this.targetPos);
         advance(this.pos, SPEED, this.rotation);
 
-        if (getDistance(this.pos, this.fleeingPos) < 20) {
-            this.fleeingPos = NaN;  // This marks that the cybird is finished fleeing
+        if (getDistance(this.pos, this.targetPos) < 20) {
+            this.targetPos = NaN;  // This marks that the cybird is finished fleeing
             this.state = CYBIRD_STATES.chasing;
+        }
+    }
+
+    /**
+     * Makes the cybird save the player's location, and then dive at it.
+     * If the player has moved, the cybird misses. If the cybird
+     * encounters the player in its dive, the player takes damage.
+     * Whether the cybird hits or misses, it turns to flee after the dive
+     * is completed.
+     */
+    attack() {
+        advance(
+            this.pos,
+            SPEED * 1.5, 
+            this.rotation
+        );
+
+        if (getDistance(this.pos, player.pos) < 40 || (this.detectWall())) {
+
+            if (getDistance(this.pos, player.pos) < 40) {
+                player.health--;
+            }
+
+            this.state = CYBIRD_STATES.fleeing;
+            this.targetPos = new p5.Vector(
+                random(WALL_PADDING + 30, width - WALL_PADDING - 30),
+                random(cameraY, cameraY + height)
+            );
         }
     }
 
@@ -281,6 +342,8 @@ class Cybird {
             this.orbit();
         } else if (this.state == CYBIRD_STATES.fleeing) {
             this.flee();
+        } else if (this.state == CYBIRD_STATES.attacking) {
+            this.attack();
         }
     }
 

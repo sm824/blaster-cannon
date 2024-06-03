@@ -8,6 +8,7 @@ const CYBIRD_HITBOX_SIZE = 80;
 const CYBIRD_ORBIT_RANGE = 250;  // The distance at which the cybirds orbit the player
 const CYBIRD_CHASE_DISTANCE = 50;  // This value added to CYBIRD_ORBIT_RANGE makes up the aggro distance in pixels for all cybirds
 const MIN_CYBIRD_SPAWN_INTERVAL = 480;
+const CYBIRD_ATTACK_PROBABILITY = 1;  // Higher values = more frequent attacks
 const CYBIRD_STATES = {
     patrolling: 0,
     chasing: 1,
