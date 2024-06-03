@@ -88,7 +88,7 @@ function draw() {
     // Determines if more cybirds should spawn
     if (cybirdSpawnBlock == 0 && random(600 / CYBIRD_SPAWN_FACTOR) < playerAdvance / 1000) {
 
-        cybirdSpawnBlock = Math.floor(MIN_CYBIRD_SPAWN_INTERVAL / (playerAdvance / 5000));
+        cybirdSpawnBlock = Math.floor(MIN_CYBIRD_SPAWN_INTERVAL / (playerAdvance / 5000 + 1));
 
         // Determines how many cybirds should spawn in the new flock, at randomized location
         for (let newBird = 0; newBird < random(1, 4); newBird++) {
