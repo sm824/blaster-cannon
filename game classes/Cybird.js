@@ -24,6 +24,8 @@ class Cybird {
 
         this.frame = random(60);  // Tracks the frame of the animation
         this.rotation = 0;  // In degrees
+        this.orbitRotation = 0;
+        this.orbitDirection = 1;  // +1 for clockwise, -1 for counter-clockwise
         this.pos = pos;
 
         // Gets randomized colors for the cybird
@@ -190,9 +192,49 @@ class Cybird {
     chase() {
         this.rotation = aim(this.pos, player.pos);
         advance(this.pos, SPEED, this.rotation);  // The cybird cannot go slower than SPEED, or the player could outrun it
-    
+
         if (getDistance(player.pos, this.pos) < CYBIRD_ORBIT_RANGE) {
-            this.state = CYBIRD_STATES.orbitting
+            this.state = CYBIRD_STATES.orbitting;
+            this.orbitRotation = aim(player.pos, this.pos);
+        }
+    }
+
+    /**
+     * Moves the cybird in a circle around the player.
+     * During this stage, there is a chance the cybird may attack
+     */
+    orbit() {
+
+        // Changes the rotation to be perpendicular to the angle at which the cybird orbits the cannon
+        // This makes the cybird point the direction it is going
+        this.rotation = this.orbitRotation + 90 * this.orbitDirection;
+
+        // Alters the cybird's roation around the player, checking for walls
+        if (this.pos.x > width - WALL_PADDING || this.pos.x < WALL_PADDING) {
+
+            // Teleports the cybird out of the wall if it is stuck in one    
+            if (this.pos.x > width - WALL_PADDING && (player.isJumping)) {
+                this.pos.x -= 10;
+                this.orbitRotation = 0;
+            } else if (player.isJumping) {
+                this.pos.x += 10;
+                this.orbitRotation = 180;
+            }
+
+            advance(this.pos, 20, -this.rotation);  // Prevents the cybird from getting stuck in a wall
+
+            this.orbitDirection = -this.orbitDirection;  // Reverses the direction the cybird orbits in
+        }
+        else {
+            this.orbitRotation += this.orbitDirection;  // Orbits the cybird
+
+            // Moves the cybird to match the calculated orbit
+            this.pos = player.pos.copy();
+            advance(
+                this.pos,
+                CYBIRD_ORBIT_RANGE,
+                this.orbitRotation
+            );
         }
     }
 
@@ -207,7 +249,7 @@ class Cybird {
         } else if (this.state == CYBIRD_STATES.chasing) {
             this.chase();
         } else if (this.state == CYBIRD_STATES.orbitting) {
-            //
+            this.orbit();
         }
     }
 

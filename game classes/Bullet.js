@@ -31,7 +31,7 @@ class Bullet {
    */
   monitor() {
     // Moves the bullet
-    advance(this.pos, SPEED, this.angle);
+    advance(this.pos, SPEED * 2, this.angle);
 
     // Determines if the bullet has gone off-screen
     if (
