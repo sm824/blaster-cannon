@@ -7,6 +7,7 @@ const THEME_COLOR = [121, 33, 39];
 const CYBIRD_HITBOX_SIZE = 80;
 const CYBIRD_ORBIT_RANGE = 250;  // The distance at which the cybirds orbit the player
 const CYBIRD_CHASE_DISTANCE = 50;  // This value added to CYBIRD_ORBIT_RANGE makes up the aggro distance in pixels for all cybirds
+const MIN_CYBIRD_SPAWN_INTERVAL = 480;
 const CYBIRD_STATES = {
     patrolling: 0,
     chasing: 1,

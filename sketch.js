@@ -26,6 +26,7 @@ const HEALTH_COLORS = [
 let canvas;
 let gameFont;
 let cybirds;
+let cybirdSpawnBlock;  // Controls how many frames pass before
 
 function preload() {
     // Font Source: https://fonts.google.com/specimen/Orbitron?preview.text=Health
@@ -60,6 +61,7 @@ function setup() {
     playerAdvance = 0;
     cameraY = 0;
     cybirds = [];
+    cybirdSpawnBlock = 300;
 
     // Spawns the cannon
     player = new Cannon(
@@ -76,8 +78,17 @@ function setup() {
 function draw() {
     background(200);
 
+    console.log("Cybird spawn block: " + cybirdSpawnBlock);
+
+    // Counts down since the last cybird spawn, to prevent
+    if (cybirdSpawnBlock > 0) {
+        cybirdSpawnBlock--;
+    }
+
     // Determines if more cybirds should spawn
-    if (random(600 / CYBIRD_SPAWN_FACTOR) < playerAdvance / 1000) {
+    if (cybirdSpawnBlock == 0 && random(600 / CYBIRD_SPAWN_FACTOR) < playerAdvance / 1000) {
+
+        cybirdSpawnBlock = Math.floor(MIN_CYBIRD_SPAWN_INTERVAL / (playerAdvance / 5000));
 
         // Determines how many cybirds should spawn in the new flock, at randomized location
         for (let newBird = 0; newBird < random(1, 4); newBird++) {
