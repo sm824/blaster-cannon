@@ -27,6 +27,7 @@ class Cybird {
         this.orbitRotation = 0;
         this.orbitDirection = 1;  // +1 for clockwise, -1 for counter-clockwise
         this.pos = pos;
+        this.fleeingPos = NaN;  // Equals NaN when the cybird is not fleeing, and holds a p5.Vector object when it is
 
         // Gets randomized colors for the cybird
         this.color1 = this.getRandomHSL();  // Main body color
@@ -196,6 +197,7 @@ class Cybird {
         if (getDistance(player.pos, this.pos) < CYBIRD_ORBIT_RANGE) {
             this.state = CYBIRD_STATES.orbitting;
             this.orbitRotation = aim(player.pos, this.pos);
+            this.orbitDirection = [-1, 1][Math.floor(random(0, 2))];  // Evaluates to a 1 or -1
         }
     }
 
@@ -209,22 +211,31 @@ class Cybird {
         // This makes the cybird point the direction it is going
         this.rotation = this.orbitRotation + 90 * this.orbitDirection;
 
-        // Alters the cybird's roation around the player, checking for walls
+        // Checks if the cybird has met a wall
         if (this.pos.x > width - WALL_PADDING || this.pos.x < WALL_PADDING) {
-
-            // Teleports the cybird out of the wall if it is stuck in one    
-            if (this.pos.x > width - WALL_PADDING && (player.isJumping)) {
-                this.pos.x -= 10;
-                this.orbitRotation = 0;
-            } else if (player.isJumping) {
-                this.pos.x += 10;
-                this.orbitRotation = 180;
-            }
-
             advance(this.pos, 20, -this.rotation);  // Prevents the cybird from getting stuck in a wall
+            this.orbitDirection = -this.orbitDirection;
 
-            this.orbitDirection = -this.orbitDirection;  // Reverses the direction the cybird orbits in
-        }
+            // Checks if the cybird is still in the wall, meaning the player has gotten it stuck during a jump
+            if (this.pos.x > width - WALL_PADDING || this.pos.x < WALL_PADDING) {
+                
+                this.state = CYBIRD_STATES.fleeing;
+
+                // Finds a position that is away from the player
+                if (player.pos < width/2) {   // Fleeing to the left wall
+                    this.fleeingPos = new p5.Vector(
+                        width - WALL_PADDING - 100,
+                        cameraY + random(-height/2, height/2)
+                    );
+                }
+                else {  // Fleeing to the right wall
+                    this.fleeingPos = new p5.Vector(
+                        WALL_PADDING + 100,
+                        cameraY + random(-height/2, height/2)
+                    );
+                }
+            }
+    }
         else {
             this.orbitRotation += this.orbitDirection;  // Orbits the cybird
 
@@ -235,6 +246,24 @@ class Cybird {
                 CYBIRD_ORBIT_RANGE,
                 this.orbitRotation
             );
+        }
+    }
+
+    /**
+     * Uses a random location away from the cannon for the cybird to
+     * flee to, before it comes back again. The location used is
+     * this.fleeingPos, and it should be set to a p5.Vector object prior
+     * to this method call, and set to NaN when the state changes to
+     * something other than CYBIRD_STATES.fleeing
+     */
+    flee() {
+
+        this.rotation = aim(this.pos, this.fleeingPos);
+        advance(this.pos, SPEED, this.rotation);
+
+        if (getDistance(this.pos, this.fleeingPos) < 20) {
+            this.fleeingPos = NaN;  // This marks that the cybird is finished fleeing
+            this.state = CYBIRD_STATES.chasing;
         }
     }
 
@@ -250,6 +279,8 @@ class Cybird {
             this.chase();
         } else if (this.state == CYBIRD_STATES.orbitting) {
             this.orbit();
+        } else if (this.state == CYBIRD_STATES.fleeing) {
+            this.flee();
         }
     }
 

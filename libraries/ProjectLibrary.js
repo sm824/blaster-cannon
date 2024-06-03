@@ -11,8 +11,9 @@ const CYBIRD_STATES = {
     patrolling: 0,
     chasing: 1,
     orbitting: 2,
-    attacking: 3,
-    dead: 4
+    fleeing: 3,
+    attacking: 4,
+    dead: 5
 };
 
 let playerAdvance;
