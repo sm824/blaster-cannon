@@ -6,6 +6,10 @@ Assignment: Final Project
 Title: Blaster Cannon - Bane of the Cybirds
 Purpose: Runs a game in which the user plays as a cannon able to leap
          from walls, in which they must shoot down cyborg bird enemies
+
+CREDITS: Original music made with https://www.beepbox.co - https://www.beepbox.co/#9n31sbk0l00e0jt2Qa7g0jj07r1i0o452T7v1u70f40p61770q72f5q0E21990l65d06HT-SRJJJJIAAAAAh0IaE1c11T7v2u71f50p61770q72d42g3q0F21a90k762d06HT-SRJJJJIAAAAAh0IaE1c11T1v1uebf0q8y10ob23d08A9F6B9Q0681Pd756E3b862c632T4v2uf0f0q011z6666ji8k8k3jSBKSJJAArriiiiii07JCABrzrrrrrrr00YrkqHrsrrrrjr005zrAqzrjzrrqr1jRjrqGGrrzsrsA099ijrABJJJIAzrrtirqrqjqixzsrAjrqjiqaqqysttAJqjikikrizrHtBJJAzArzrIsRCITKSS099ijrAJS____Qg99habbCAYrDzh00E0b000000054AcigM004AcigRpU4AcigN934Ac0000000000x4h008h4gp246KrQvF99x4Amlhioh74LjnXwBZ1uHGuKLSg1f7MyCzQhjhZ99dvFli5darnYWhFbrGAaqtXE2hR6GKCDm3F8AJKGgFFTKaJwzE8QOY5d1yX1BPzVczS8aAzjpvcU_A3gHieAzGCL1At170Ml97iVILF7Wq_xhhhhhhhx55555556o555555564kkkkkkkjbjhYCngnV2CnHzkCzUjnUgIQpS4Qp6jd5RlApcQllmhAPhllp6jd5jFQRU2nFGi4Ow41l8kw0
+         Other audio recorded with Audacity
+         Main font taken from Google Fonts: https://fonts.google.com/specimen/Orbitron?query=orbitron
 *********************************************************************/
 const WALL_STRIPES = 10;
 const CYBIRD_ADVANCE_Y = -800;  // How far (pixels) the cybirds spawn ahead
@@ -28,9 +32,19 @@ let gameFont;
 let cybirds;
 let cybirdSpawnBlock;  // Controls how many frames pass before
 
+let gameSong;
+
 function preload() {
     // Font Source: https://fonts.google.com/specimen/Orbitron?preview.text=Health
     gameFont = loadFont("media/OrbitronFont.ttf");
+
+    // Loads sound media
+    cybirdDive = loadSound("media/BirdAttackSquack.mp3");
+    cannonFire = loadSound("media/CannonFire.mp3");
+    cannonDamage = loadSound("media/CannonDamage.mp3");
+    cybirdDamage = loadSound("media/BirdDamage.mp3");
+
+    gameSong = loadSound("media/GameSong.mp3");
 }
 
 function keyTyped() {
@@ -42,6 +56,10 @@ function keyTyped() {
     // 32 = "Space" key
     else if (keyCode == 32) {
         player.jump();
+    }
+
+    else {
+
     }
 }
 
@@ -73,10 +91,18 @@ function setup() {
     // Sends the player to one side horizontally, chosen randomly
     player.jumpingAngle = [90, 270][Math.floor(random(0, 2))];
     player.isJumping = true;
+
+    gameSong.loop();
 }
 
 function draw() {
     background(200);
+
+    if (Cybird.attackCooldown >= 1) {
+        Cybird.attackCooldown--;
+    }
+
+    console.log(Cybird.attackCooldown);
 
     // Counts down since the last cybird spawn, to prevent
     if (cybirdSpawnBlock > 0) {
@@ -118,6 +144,7 @@ function draw() {
                 player.bullets[thisBullet].pos.y < cybirds[thisBird].pos.y + CYBIRD_HITBOX_SIZE / 2
             ) {
                 cybirds[thisBird].state = CYBIRD_STATES.dead;  // State 4 marks the cybird as dead
+                cybirdDamage.play();  // This must be played here, because the cybird object just killed will be destroyed before the sound can play from it
             }
         }
     }

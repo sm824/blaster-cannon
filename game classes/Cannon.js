@@ -36,7 +36,17 @@ class Cannon {
     if (this.bulletCooldown == 0) {
       this.bullets.push(new Bullet(this.pos.copy(), this.rotation));
       this.bulletCooldown = 60;
+
+      cannonFire.play();
     }
+  }
+
+  /**
+   * Decrements the cannon's health, and plays the damage sound
+   */
+  takeDamage() {
+    this.health--;
+    cannonDamage.play();
   }
 
   /**

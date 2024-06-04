@@ -22,6 +22,12 @@ let playerAdvance;
 let cameraY;
 let player;
 
+// Global media
+let cybirdDive;
+let cannonFire;
+let cannonDamage;
+let cybirdDamage;
+
 /**
      * Moves the position a distance, by the number of pixels
      * given, in the direction of the fiven angle (degreed)
