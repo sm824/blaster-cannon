@@ -27,6 +27,7 @@ class Cannon {
     this.ignoreWallSteps = 0;
     this.bulletCooldown = 0;
     this.health = 5;
+    this.damageScreenTimer;
   }
 
   /**
@@ -47,6 +48,8 @@ class Cannon {
   takeDamage() {
     this.health--;
     cannonDamage.play();
+
+    this.damageScreenTimer = DAMAGE_SCREEN_TIME;
   }
 
   /**
@@ -112,6 +115,20 @@ class Cannon {
    * the Cannon object to operate
    */
   operateCannon() {
+
+    // Checks if the cannon has just taken damage, and colors the screen to indicate if it has
+    if (this.damageScreenTimer > 0) {
+      this.damageScreenTimer--;
+      console.log(this.damageScreenTimer);
+
+      background(
+        220,
+        0,
+        0,
+        150 - (150 - this.damageScreenTimer*(150/DAMAGE_SCREEN_TIME))
+      );
+    }
+
     push();
 
     angleMode(DEGREES);

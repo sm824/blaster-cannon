@@ -18,6 +18,8 @@ const CYBIRD_STATES = {
     dead: 5
 };
 
+DAMAGE_SCREEN_TIME = 45;  // Controls how many frames after taking damage the screen fades red
+
 let playerAdvance;
 let cameraY;
 let player;

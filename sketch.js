@@ -102,8 +102,6 @@ function draw() {
         Cybird.attackCooldown--;
     }
 
-    console.log(Cybird.attackCooldown);
-
     // Counts down since the last cybird spawn, to prevent
     if (cybirdSpawnBlock > 0) {
         cybirdSpawnBlock--;
@@ -148,8 +146,6 @@ function draw() {
             }
         }
     }
-
-    console.log("Birds on screen: " + tempBirdCount);
 
     // Checks for cybirds that were shot above, and deletes them (prevents errors that would occur if they were deleted above)
     for (let thisBird = 0; thisBird < cybirds.length; thisBird++) {
