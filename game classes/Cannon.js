@@ -119,7 +119,6 @@ class Cannon {
     // Checks if the cannon has just taken damage, and colors the screen to indicate if it has
     if (this.damageScreenTimer > 0) {
       this.damageScreenTimer--;
-      console.log(this.damageScreenTimer);
 
       background(
         220,

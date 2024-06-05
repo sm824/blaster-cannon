@@ -3,6 +3,29 @@ const SPEED = 5;  // The moving speed of the characters in the game
 const WALL_PADDING = 150;  // The thickness in pixels of the side wall
 const DIMENSIONS = [800, 920];  // The width and weight of the canvas respectively
 const THEME_COLOR = [121, 33, 39];
+const SECONDARY_COLOR = [88, 97, 97];
+const BUTTON_BORDER_PADDING = 15;
+const GAME_TITLE_Y = 800;
+
+// Source (how to create multi-line strings in JS) : https://eranstiller.com/javascript-multiline-strings#:~:text=You%20can%20use%20single%20quotes,dealing%20with%20longer%20text%20blocks.
+const PLAYER_MANUAL = '--- Game Controls ---\
+F Key:     Fire a bullet in the direction you face. there is a small\
+           cooldown between firings\
+Space Bar: Jump in the direction you face. This is the cannon\'s\
+           one form of travelling. You will automatically come to a\
+           rest upon contact with the opposite wall\
+\
+--- Objective Instructions ---\
+When the game begins, your cannon character will fly towards a\
+random side of the hallway. Your goal in the game is to advance as\
+far as possible upwards, deeper into the nest of the Cybirds. This\
+value, which functions as a score, is called "Advance", and can be\
+found in the top left corner of the screen during gameplay. The\
+Cybirds, however, will quickly start to come down the hall after\
+you in defence of their nest. They will circle and attack you,\
+whether you are in motion or stationary, and you must fire bullets\
+at them to defeat them. A single hit will destroy them, but they\
+are many in number';
 
 const CYBIRD_HITBOX_SIZE = 80;
 const CYBIRD_ORBIT_RANGE = 250;  // The distance at which the cybirds orbit the player
@@ -17,18 +40,31 @@ const CYBIRD_STATES = {
     attacking: 4,
     dead: 5
 };
+const GAMEPLAY_STATES = {
+    playing: 0,
+    menu: 1,
+    customizing: 2,
+    displayingManual: 3,
+    loadingSavegame: 4,
+    exportingSavegame: 5
+};
 
 DAMAGE_SCREEN_TIME = 45;  // Controls how many frames after taking damage the screen fades red
 
 let playerAdvance;
 let cameraY;
 let player;
+let cybirds;
+let cybirdSpawnBlock;  // Controls the initial minumum frames that pass after a cybird flock spawns before more can spawn
+let currentGameState;  // Tracks if the player is viewing the menu, customize screen, or playing the game
 
-// Global media
+// Global audio media
 let cybirdDive;
 let cannonFire;
 let cannonDamage;
 let cybirdDamage;
+
+let gameSong;
 
 /**
      * Moves the position a distance, by the number of pixels
@@ -100,5 +136,63 @@ function aim(anchorPos, targetPos) {
  *        distance
  */
 function getDistance(pos1, pos2) {
-    return Math.sqrt((pos1.x - pos2.x)**2 + (pos1.y - pos2.y)**2);
+    return Math.sqrt((pos1.x - pos2.x) ** 2 + (pos1.y - pos2.y) ** 2);
+}
+
+/**
+ * Sets up global variables and other components required for the
+ * game to play
+ */
+function playGame() {
+
+    currentGameState = GAMEPLAY_STATES.playing;
+
+    // Sets the initial values for required gameplay variables
+    playerAdvance = 0;
+    cameraY = 0;
+    cybirds = [];
+    cybirdSpawnBlock = 300;
+
+    // Spawns the cannon
+    player = new Cannon(
+        new p5.Vector(width / 2, height / 2),
+        "#B2A79A",
+        "#616161"
+    );
+
+    // Sends the player to one side horizontally, chosen randomly
+    player.jumpingAngle = [90, 270][Math.floor(random(0, 2))];
+    player.isJumping = true;
+
+    gameSong.loop();
+}
+
+/**
+ * Runs the initial commands to set up the cannon customization
+ * page
+ */
+function customizeCannon() {
+    currentGameState = GAMEPLAY_STATES.customizing;
+}
+
+/**
+ * Runs the set-up instructions for the page that displays info on
+ * how the game is played
+ */
+function displayManual() {
+    currentGameState = GAMEPLAY_STATES.displayingManual;
+}
+
+/**
+ * Sets up the program to load a JSON file
+ */
+function loadSavegame() {
+    currentGameState = GAMEPLAY_STATES.loadingSavegame;
+}
+
+/**
+ * Sets up the program to export a savegame JSON file
+ */
+function exportSavegame() {
+    currentGameState = GAMEPLAY_STATES.exportingSavegame;
 }
