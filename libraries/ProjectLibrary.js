@@ -64,6 +64,12 @@ let cancelMenuButton;
 let menuButton;
 let mouseIsPressedOnce = false;  // Tracks a mouse click for 1 frame (needed since built-in mouseIsPressed stays true when the click is held)
 
+// Cannon character color customization variables
+const DEFAULT_CANNON_COLORS = {body: "#B2A79A", barrel: "#616161", base: "grey"};
+const COLOR_PICKER_ALIGN = 240;
+const COLOR_PICKER_DIMENSIONS = [100, 50];
+let cannonColorPickers = {body: NaN, barrel: NaN, base: NaN};
+
 // Global audio media
 let cybirdDive;
 let cannonFire;
@@ -151,6 +157,10 @@ function getDistance(pos1, pos2) {
  */
 function playGame() {
 
+    player.health = 5;
+    player.pos.x = width / 2;
+    player.pos.y = height / 2;
+
     currentGameState = GAMEPLAY_STATES.playing;
 
     // Sets the initial values for required gameplay variables
@@ -158,13 +168,6 @@ function playGame() {
     cameraY = 0;
     cybirds = [];
     cybirdSpawnBlock = 300;
-
-    // Spawns the cannon
-    player = new Cannon(
-        new p5.Vector(width / 2, height / 2),
-        "#B2A79A",
-        "#616161"
-    );
 
     // Sends the player to one side horizontally, chosen randomly
     player.jumpingAngle = [90, 270][Math.floor(random(0, 2))];
@@ -179,14 +182,37 @@ function playGame() {
  */
 function customizeCannon() {
     currentGameState = GAMEPLAY_STATES.customizing;
-}
 
-/**
- * Runs the set-up instructions for the page that displays info on
- * how the game is played
- */
-function displayManual() {
-    currentGameState = GAMEPLAY_STATES.displayingManual;
+    // Makes the cannon render in the center of the preview circle
+    cameraY = 0;
+    player.pos.x = width / 2;
+    player.pos.y = 600;
+    player.rotation = 180;
+
+    // creates color-pickers (used by cannon customization page)
+    cannonColorPickers.body = createColorPicker(player.colors.body);
+    cannonColorPickers.barrel = createColorPicker(player.colors.barrel);
+    cannonColorPickers.base = createColorPicker(player.colors.base);
+
+    // Sizes the color pickers
+    cannonColorPickers.body.size(...COLOR_PICKER_DIMENSIONS);
+    cannonColorPickers.barrel.size(...COLOR_PICKER_DIMENSIONS);
+    cannonColorPickers.base.size(...COLOR_PICKER_DIMENSIONS);
+
+    // Sets the menu button to clean up the colorpickers in addition to
+    // its usual processes, then set its operation back to the general
+    // requirements
+    menuButton.buttonOperation = () => {
+
+        // Discards of the color pickers when the page is left
+        // Source (for removing p5.Elements): https://www.w3schools.com/jsref/met_element_remove.asp
+        cannonColorPickers.body.remove();
+        cannonColorPickers.barrel.remove();
+        cannonColorPickers.base.remove();
+
+        returnToMenu();
+        menuButton.buttonOperation = returnToMenu;
+    }
 }
 
 /**

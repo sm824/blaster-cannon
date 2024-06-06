@@ -12,9 +12,9 @@ class Cannon {
    * color1 = the color for the body of this cannon
    * color2 = the color for the barrel of this cannon
    */
-  constructor(pos, color1, color2) {
+  constructor(pos) {
     this.pos = pos;
-    this.colors = [color1, color2];
+    this.colors = DEFAULT_CANNON_COLORS;
 
     // The attribute rotation uses degrees, and tracks the cannon's rotation
     this.rotation = 0;
@@ -98,13 +98,13 @@ class Cannon {
       pop();
     }
 
-    fill("grey");
+    fill(this.colors.base);
     circle(0, 0, 50); // Draws the circlular base
 
-    fill(this.colors[1]);
+    fill(this.colors.barrel);
     rect(0, 25, 20, 35); // Draws the barrel
 
-    fill(this.colors[0]);
+    fill(this.colors.body);
     square(0, 0, 42, 5); // Draws the body
 
     pop();
