@@ -6,8 +6,9 @@ const THEME_COLOR = [121, 33, 39];
 const SECONDARY_COLOR = [88, 97, 97];
 const BUTTON_BORDER_PADDING = 15;
 const GAME_TITLE_Y = 800;
+const DEFAULT_MENU_BTN_POS = new p5.Vector(600, 30);
 
-// Source (how to create multi-line strings in JS) : https://eranstiller.com/javascript-multiline-strings#:~:text=You%20can%20use%20single%20quotes,dealing%20with%20longer%20text%20blocks.
+// Source (how to create multi-line strings in JS): https://stackoverflow.com/questions/805107/creating-multiline-strings-in-javascript
 const PLAYER_MANUAL = `--- Game Controls ---
 F Key:     Fire a bullet in the direction you face. there is a small
            cooldown between firings
@@ -58,6 +59,8 @@ let cybirds;
 let cybirdSpawnBlock;  // Controls the initial minumum frames that pass after a cybird flock spawns before more can spawn
 let currentGameState;  // Tracks if the player is viewing the menu, customize screen, or playing the game
 
+let gameplayPaused = false;
+let cancelMenuButton;
 let menuButton;
 let mouseIsPressedOnce = false;  // Tracks a mouse click for 1 frame (needed since built-in mouseIsPressed stays true when the click is held)
 
@@ -205,15 +208,70 @@ function exportSavegame() {
  */
 function returnToMenu() {
 
-    if (currentGameState == GAMEPLAY_STATES.playing) {
-        console.log("Attempted return to menu from gaameplay");
+    // If the player has clicked the menu button from the game, move the
+    // button onto the confirmation dialog
+    if (currentGameState == GAMEPLAY_STATES.playing && !gameplayPaused) {
+        gameplayPaused = true;
+        menuButton.pos.x = width / 2 - 165;
+        menuButton.pos.y = height / 2 + 50
 
-        // Inform user their progress will be lost to return now, and ask them if they really want to quit
-        /* PSUEDO-CODE
-        Do you want to quit?
-        if no:
-            return;
-        */
+        // Sets the menuButton to perform special operations specific to
+        // exiting gameplay
+        menuButton.buttonOperation = () => {
+            returnToMenu();
+            menuButton.pos = DEFAULT_MENU_BTN_POS.copy();
+            menuButton.buttonOperation = returnToMenu;
+            gameplayPaused = false;
+
+            // Stops and resets the song to its beginning
+            gameSong.stop();
+        }
+        
+        return;  // Stops the function call early
     }
-    currentGameState = GAMEPLAY_STATES.menu;
+
+    currentGameState = GAMEPLAY_STATES.menu;    
+}
+
+/**
+ * Runs a dialog box that informs the player their progress will be lost
+ * to return now, and confirms they want to quit anyway.
+ * Note: Must be run in a loop
+ */
+function confirmReturnToMenu() {    
+
+    // Draws the dialog background
+    push();
+
+    rectMode(CENTER);
+
+    fill(THEME_COLOR);
+    rect(width / 2, height / 2, 400, 500, 25);  // Frame
+
+    fill("grey");
+    rect(width / 2, height / 2, 380, 480, 25);  // Interior BG
+
+    // Draws the decorative bars (top then bottom)
+    fill(THEME_COLOR);
+    for (let thisBar = -1; thisBar <= 1; thisBar += 2) {
+        rect(
+            width / 2,
+            height / 2 + 260 * thisBar,
+            300,
+            10,
+            10
+        );
+    }
+
+    // Writes the text asking if the user wants to proceed
+    fill("black");
+    textAlign(CENTER);
+
+    textSize(24);
+    text("Do you want to exit to the\nmain menu?\n", width / 2, height / 2 - 100);
+
+    textSize(16);
+    text("You will lose your progress if you\nleave before the game is over", width / 2, height / 2 - 30);
+
+    pop();
 }

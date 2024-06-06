@@ -1,5 +1,5 @@
 /*********************************************************************
-Is used to make buttons stylized to the game
+A class used to make buttons stylized to the game
 *********************************************************************/
 
 class BlasterCannonButton {
