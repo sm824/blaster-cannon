@@ -41,6 +41,14 @@ let menuButtons = {
     exportSavegame: NaN
 };
 
+/**
+ * Sets the global mouse click variable to true for 1
+ * frame. This is used by the game buttons to detect clicks
+ */
+function mousePressed() {
+    mouseIsPressedOnce = true;
+}
+
 function preload() {
     // Font Source: https://fonts.google.com/specimen/Orbitron?preview.text=Health
     gameFont = loadFont("media/OrbitronFont.ttf");
@@ -120,6 +128,15 @@ function setup() {
         exportSavegame,
         18
     );
+
+    // Creates the button used to return to the menu from various pages
+    menuButton = new BlasterCannonButton(
+        "Back to\nMenu",
+        600, 30,
+        160, 100,
+        returnToMenu,
+        18
+    )
 }
 
 function draw() {
@@ -176,7 +193,44 @@ function draw() {
     }
 
     else if (currentGameState == GAMEPLAY_STATES.displayingManual) {
-        //
+        
+        push();
+        rectMode(CENTER);
+
+        // Draws the manual background
+        background(SECONDARY_COLOR);
+
+        // Draws the frame
+        fill(THEME_COLOR);
+        rect(
+            width / 2,
+            height / 2,
+            width - 80,
+            height - 80,
+            90
+        );
+
+        // Fills the interior of the frame
+        fill("grey");
+        rect(
+            width / 2,
+            height / 2,
+            width - 100,
+            height - 100,
+            80
+        );
+
+        // Writes the manual text
+        fill("black");
+        textSize(18);
+        textLeading(40);
+
+        text(PLAYER_MANUAL, 80, 120);
+
+        pop();
+
+        // Monitors the return-to-menu button
+        menuButton.monitorButton();
     }
 
     else if (currentGameState == GAMEPLAY_STATES.loadingSavegame) {
@@ -361,4 +415,6 @@ function draw() {
         (windowWidth - DIMENSIONS[0]) / 2,
         (windowHeight - DIMENSIONS[1]) / 2
     );
+
+    mouseIsPressedOnce = false;  // Resets the single-click mouse detection variable
 }

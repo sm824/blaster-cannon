@@ -8,24 +8,24 @@ const BUTTON_BORDER_PADDING = 15;
 const GAME_TITLE_Y = 800;
 
 // Source (how to create multi-line strings in JS) : https://eranstiller.com/javascript-multiline-strings#:~:text=You%20can%20use%20single%20quotes,dealing%20with%20longer%20text%20blocks.
-const PLAYER_MANUAL = '--- Game Controls ---\
-F Key:     Fire a bullet in the direction you face. there is a small\
-           cooldown between firings\
-Space Bar: Jump in the direction you face. This is the cannon\'s\
-           one form of travelling. You will automatically come to a\
-           rest upon contact with the opposite wall\
-\
---- Objective Instructions ---\
-When the game begins, your cannon character will fly towards a\
-random side of the hallway. Your goal in the game is to advance as\
-far as possible upwards, deeper into the nest of the Cybirds. This\
-value, which functions as a score, is called "Advance", and can be\
-found in the top left corner of the screen during gameplay. The\
-Cybirds, however, will quickly start to come down the hall after\
-you in defence of their nest. They will circle and attack you,\
-whether you are in motion or stationary, and you must fire bullets\
-at them to defeat them. A single hit will destroy them, but they\
-are many in number';
+const PLAYER_MANUAL = `--- Game Controls ---
+F Key:     Fire a bullet in the direction you face. there is a small
+           cooldown between firings
+Space Bar: Jump in the direction you face. This is the cannon's
+           one form of travelling. You will automatically come to a
+           rest upon contact with the opposite wall
+
+--- Objective Instructions ---
+When the game begins, your cannon character will fly towards a
+random side of the hallway. Your goal in the game is to advance as
+far as possible upwards, deeper into the nest of the Cybirds. This
+value, which functions as a score, is called "Advance", and can be
+found in the top left corner of the screen during gameplay. The
+Cybirds, however, will quickly start to come down the hall after
+you in defence of their nest. They will circle and attack you,
+whether you are in motion or stationary, and you must fire bullets
+at them to defeat them. A single hit will destroy them, but they
+are many in number, so beware!`;
 
 const CYBIRD_HITBOX_SIZE = 80;
 const CYBIRD_ORBIT_RANGE = 250;  // The distance at which the cybirds orbit the player
@@ -57,6 +57,9 @@ let player;
 let cybirds;
 let cybirdSpawnBlock;  // Controls the initial minumum frames that pass after a cybird flock spawns before more can spawn
 let currentGameState;  // Tracks if the player is viewing the menu, customize screen, or playing the game
+
+let menuButton;
+let mouseIsPressedOnce = false;  // Tracks a mouse click for 1 frame (needed since built-in mouseIsPressed stays true when the click is held)
 
 // Global audio media
 let cybirdDive;
@@ -195,4 +198,22 @@ function loadSavegame() {
  */
 function exportSavegame() {
     currentGameState = GAMEPLAY_STATES.exportingSavegame;
+}
+
+/**
+ * Sends the player back to the menu
+ */
+function returnToMenu() {
+
+    if (currentGameState == GAMEPLAY_STATES.playing) {
+        console.log("Attempted return to menu from gaameplay");
+
+        // Inform user their progress will be lost to return now, and ask them if they really want to quit
+        /* PSUEDO-CODE
+        Do you want to quit?
+        if no:
+            return;
+        */
+    }
+    currentGameState = GAMEPLAY_STATES.menu;
 }

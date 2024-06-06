@@ -109,7 +109,7 @@ class BlasterCannonButton {
      * command
      */
     isClicked() {
-        if (this.isTouchingCursor && mouseIsPressed) {
+        if (this.isTouchingCursor && mouseIsPressedOnce) {
             this.buttonOperation();
         }
     }
