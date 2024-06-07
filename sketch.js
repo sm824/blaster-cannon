@@ -350,6 +350,8 @@ function draw() {
         // Runs the game if the player is playing it (not the menu or anything else)
         else {
 
+            console.log("Extra lives: " + extraLives.length);
+
             if (gameplayPaused) {
                 confirmReturnToMenu();
                 cancelMenuButton.monitorButton();
@@ -360,11 +362,30 @@ function draw() {
 
                 background(200);
 
+                // Determines of an extra life should spawn
+                if (random(0, 1800) < 1 && player.health < 5) {
+                    extraLives.push(
+                        new ExtraLife(new p5.Vector(
+                            random(WALL_PADDING + 20, width - WALL_PADDING - 20),
+                            cameraY - 1000
+                        ))
+                    );
+                }
+
+                // Monitors the existing extra lives
+                for (let thisLife = 0; thisLife < extraLives.length; thisLife++) {
+                    extraLives[thisLife].monitor();
+                    if (extraLives[thisLife].isOffScreen) {
+                        extraLives.splice(thisLife, 1);
+                    }
+                }
+
+                // Counts down the cybird attack cooldown
                 if (Cybird.attackCooldown >= 1) {
                     Cybird.attackCooldown--;
                 }
 
-                // Counts down since the last cybird spawn, to prevent
+                // Counts down since the last cybird spawn, to prevent too many from spawning at once
                 if (cybirdSpawnBlock > 0) {
                     cybirdSpawnBlock--;
                 }
@@ -383,21 +404,13 @@ function draw() {
                     }
                 }
 
-                let tempBirdCount = 0;
-
                 // Operates the cybirds on the canvas
                 for (let thisBird = 0; thisBird < cybirds.length; thisBird++) {
                     cybirds[thisBird].run();
 
-                    if (cybirds[thisBird].pos.y < cameraY + height &&
-                        cybirds[thisBird].pos.y > cameraY
-                    ) {
-                        tempBirdCount++;
-                    }
-
                     for (let thisBullet = 0; thisBullet < player.bullets.length; thisBullet++) {
 
-                        // Checks if the current bullet has met the cuurrent cybird's hitbox
+                        // Checks if the current bullet has met the current cybird's hitbox
                         if (player.bullets[thisBullet].pos.x > cybirds[thisBird].pos.x - CYBIRD_HITBOX_SIZE / 2 &&
                             player.bullets[thisBullet].pos.x < cybirds[thisBird].pos.x + CYBIRD_HITBOX_SIZE / 2 &&
                             player.bullets[thisBullet].pos.y > cybirds[thisBird].pos.y - CYBIRD_HITBOX_SIZE / 2 &&

@@ -78,7 +78,6 @@ class Cybird {
         }
 
         push();
-        angleMode(DEGREES);
         colorMode(HSL);
 
         translate(this.pos.x, this.pos.y - cameraY);

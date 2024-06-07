@@ -185,8 +185,8 @@ class Cannon {
 
       // Draws the bullets' bodies
       push();
-
       fill("black");
+
       circle(
         this.bullets[thisBullet].pos.x,
         this.bullets[thisBullet].pos.y - cameraY * 2,
@@ -195,6 +195,23 @@ class Cannon {
 
       pop();
 
+      // Checks if any bullets have hit an ExtraLife object, and heals cannon
+      for (let thisLife = 0; thisLife < extraLives.length; thisLife++) {
+        console.log("current bullet: " + this.bullets[thisBullet]);
+        if (getDistance(extraLives[thisLife].pos, this.bullets[thisBullet].pos) < 40*EXTRA_LIFE_SIZE) {
+          
+          // Restores some player health
+          if (this.health < 5) {
+            this.health++;
+          }
+
+          // Marks the extra life to be deleted
+          extraLives[thisLife].isOffScreen = true;
+        }
+      }
+
+      // Deletes the bullets off the screen (NOTE: this must go last in
+      // this loop)
       if (this.bullets[thisBullet].isOffScreen) {
         this.bullets.splice(thisBullet, 1);
       }

@@ -28,6 +28,8 @@ whether you are in motion or stationary, and you must fire bullets
 at them to defeat them. A single hit will destroy them, but they
 are many in number, so beware!`;
 
+const EXTRA_LIFE_SIZE = 0.75;
+
 const CYBIRD_HITBOX_SIZE = 80;
 const CYBIRD_ORBIT_RANGE = 250;  // The distance at which the cybirds orbit the player
 const CYBIRD_CHASE_DISTANCE = 50;  // This value added to CYBIRD_ORBIT_RANGE makes up the aggro distance in pixels for all cybirds
@@ -55,6 +57,7 @@ DAMAGE_SCREEN_TIME = 45;  // Controls how many frames after taking damage the sc
 let playerAdvance;
 let cameraY;
 let player;
+let extraLives;
 let cybirds;
 let cybirdSpawnBlock;  // Controls the initial minumum frames that pass after a cybird flock spawns before more can spawn
 let currentGameState;  // Tracks if the player is viewing the menu, customize screen, or playing the game
@@ -166,6 +169,7 @@ function playGame() {
     // Sets the initial values for required gameplay variables
     playerAdvance = 0;
     cameraY = 0;
+    extraLives = [];
     cybirds = [];
     cybirdSpawnBlock = 300;
 
