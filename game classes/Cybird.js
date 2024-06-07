@@ -220,7 +220,11 @@ class Cybird {
         this.rotation = aim(this.pos, player.pos);
         advance(this.pos, SPEED, this.rotation);  // The cybird cannot go slower than SPEED, or the player could outrun it
 
-        if (getDistance(player.pos, this.pos) < CYBIRD_ORBIT_RANGE) {
+        if (getDistance(player.pos, this.pos) < CYBIRD_ORBIT_RANGE - 50) {
+            this.state = CYBIRD_STATES.fleeing;
+            this.setDistantTarget();
+        }
+        else if (getDistance(player.pos, this.pos) < CYBIRD_ORBIT_RANGE) {
             this.state = CYBIRD_STATES.orbitting;
             this.orbitRotation = aim(player.pos, this.pos);
             this.orbitDirection = [-1, 1][Math.floor(random(0, 2))];  // Evaluates to a 1 or -1
@@ -247,19 +251,7 @@ class Cybird {
 
                 this.state = CYBIRD_STATES.fleeing;
 
-                // Finds a position that is away from the player
-                if (player.pos < width / 2) {   // Fleeing to the left wall
-                    this.targetPos = new p5.Vector(
-                        width - WALL_PADDING - 100,
-                        cameraY + random(0, height)
-                    );
-                }
-                else {  // Fleeing to the right wall
-                    this.targetPos = new p5.Vector(
-                        WALL_PADDING + 100,
-                        cameraY + random(0, height)
-                    );
-                }
+                this.setDistantTarget();
             }
         }
         else {
@@ -315,7 +307,7 @@ class Cybird {
         // Makes the cybird dive forwards
         advance(
             this.pos,
-            SPEED * 1.5, 
+            SPEED * 1.5,
             this.rotation
         );
 
@@ -334,6 +326,28 @@ class Cybird {
                 random(cameraY, cameraY + height)
             );
         }
+    }
+
+    /**
+     * Returns a position for the cybird to flee to that is away from the
+     * player currently
+     */
+    setDistantTarget() {
+
+        // Finds a position that is away from the player
+        if (player.pos < width / 2) {   // Fleeing to the left wall
+            this.targetPos = new p5.Vector(
+                width - WALL_PADDING - 100,
+                cameraY + random(0, height)
+            );
+        }
+        else {  // Fleeing to the right wall
+            this.targetPos = new p5.Vector(
+                WALL_PADDING + 100,
+                cameraY + random(0, height)
+            );
+        }
+
     }
 
     /**
