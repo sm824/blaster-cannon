@@ -12,7 +12,6 @@ CREDITS: Original music made with https://www.beepbox.co - https://www.beepbox.c
          Main font taken from Google Fonts: https://fonts.google.com/specimen/Orbitron?query=orbitron
          Menu background (media/TitleScreen.jpg) made using Clip Studio Paint
 *********************************************************************/
-const WALL_STRIPES = 10;
 const CYBIRD_ADVANCE_Y = -800;  // How far (pixels) the cybirds spawn ahead
 const CYBIRD_WALL_DISTANCE = 50;  // The minumum distance a cybird in the hall must be from the wall (before it comes to a player)
 const CYBIRD_SPAWN_FACTOR = 1;  // A factor to control the spawn of cybirds. Higher values = more cybirds overall
@@ -30,6 +29,7 @@ const HEALTH_COLORS = [
 
 let canvas;
 let gameFont;
+let newHideawaySide;
 
 let menuBG;
 
@@ -91,6 +91,7 @@ function keyTyped() {
 function setup() {
     canvas = createCanvas(...DIMENSIONS);
     currentGameState = GAMEPLAY_STATES.menu;
+    highestAdvance = 0;
 
     fill(SECONDARY_COLOR);  // Sets the color of the game walls
     textFont(gameFont);
@@ -332,7 +333,7 @@ function draw() {
             // Writes the manual text
             fill("black");
             textSize(18);
-            textLeading(40);
+            textLeading(35);
 
             text(PLAYER_MANUAL, 80, 120);
 
@@ -350,8 +351,6 @@ function draw() {
         // Runs the game if the player is playing it (not the menu or anything else)
         else {
 
-            console.log("Extra lives: " + extraLives.length);
-
             if (gameplayPaused) {
                 confirmReturnToMenu();
                 cancelMenuButton.monitorButton();
@@ -362,7 +361,63 @@ function draw() {
 
                 background(200);
 
-                // Determines of an extra life should spawn
+                // Tracks the cannon position and player's score
+                if (player.pos.y - height / 2 < cameraY) {
+                    cameraY = player.pos.y - height / 2;
+                    playerAdvance = -cameraY;
+                }
+
+                // Draws the walls (right, then left)
+                for (let thisWall = 0; thisWall < 2; thisWall++) {
+
+                    // Base walls
+                    rect(
+                        (width - WALL_PADDING) * thisWall,
+                        0,
+                        WALL_PADDING,
+                        height
+                    );
+
+                    push();
+                    fill(THEME_COLOR);
+
+                    // Draws the wall patterns
+                    for (let thisBar = 0; thisBar < WALL_STRIPES + 1; thisBar++) {
+                        rect(
+                            (width - WALL_PADDING) * thisWall,
+                            height - (thisBar * (height / WALL_STRIPES) + cameraY % (height / WALL_STRIPES)),
+                            WALL_PADDING,
+                            10
+                        );
+                    }
+
+                    pop();
+                }
+
+                // Moniters the hideaways
+                for (let thisHideaway = 0; thisHideaway < hideaways.length; thisHideaway++) {
+                    
+                    hideaways[thisHideaway].monitor();
+
+                    // TEMPORARY
+                    // TEMPORARY
+                    push();
+                    translate(0, -cameraY);
+                    ellipseMode(CENTER);
+                    fill("pink");
+                    circle(hideaways[thisHideaway].pos.x, hideaways[thisHideaway].pos.y, 50);
+                    pop();
+                    // TEMPORARY
+                    // TEMPORARY
+
+                    // Removes hideaways that have gone off the screen
+                    if (hideaways[thisHideaway].pos.y - Hideaway.hideawayHeight/2 > cameraY + height) {
+                        hideaways.splice(thisHideaway, 1);
+                        console.log("DELETING HIDEAWAY!");
+                    }
+                }
+
+                // Determines if an extra life should spawn
                 if (random(0, 1800) < 1 && player.health < 5) {
                     extraLives.push(
                         new ExtraLife(new p5.Vector(
@@ -429,44 +484,11 @@ function draw() {
                     }
                 }
 
-                // Draws the walls (right, then left)
-                for (let thisWall = 0; thisWall < 2; thisWall++) {
-
-                    // Base walls
-                    rect(
-                        (width - WALL_PADDING) * thisWall,
-                        0,
-                        WALL_PADDING,
-                        height
-                    );
-
-                    push();
-                    fill(THEME_COLOR);
-
-                    // Draws the wall patterns
-                    for (let thisBar = 0; thisBar < WALL_STRIPES + 1; thisBar++) {
-                        rect(
-                            (width - WALL_PADDING) * thisWall,
-                            height - (thisBar * (height / WALL_STRIPES) + cameraY % (height / WALL_STRIPES)),
-                            WALL_PADDING,
-                            10
-                        );
-                    }
-
-                    pop();
-                }
-
                 push();
                 translate(0, cameraY);
 
                 // Maintains the player's cannon character
                 player.operateCannon();
-
-                // Tracks the cannon position and player's score
-                if (player.pos.y - height / 2 < cameraY) {
-                    cameraY = player.pos.y - height / 2;
-                    playerAdvance = -cameraY;
-                }
 
                 // Draws overlays containing the player's stats
                 translate(0, -cameraY);
@@ -533,7 +555,49 @@ function draw() {
                     );
                 }
 
+                console.log("\n\nGAME INFO\nHideaways: " + hideaways.length,
+                    "\nPlayer Y: " + player.pos.y
+                );
+
+                for (let i = 0; i < hideaways.length; i++) {
+                    console.log("Hideaway #" + i + " Y: " + hideaways[i].pos.y);
+                    console.log(hideaways[i]);
+                }
+
+                console.log("player.isVisible: " + player.isVisible);
+
                 pop();
+
+                // Determines if another hideaway should spawn, which only occurs while
+                // the player is jumping. This prevents an excessive
+                // number of hideaways from spawning while the player is
+                // stationary
+                if (random(60) < 1 && player.isJumping && hideaways.length < 2) {
+                    // ^1200
+
+                    // Forces the side of the new hideaway to be opposite
+                    // the side of one that already exists (allows for
+                    // only 2 hideaways at any given time, and prevents
+                    // any from spawning over each other)
+                    while (true) {
+
+                        // Chooses a random side
+                        newHideawaySide = [WALL_SIDES.left, WALL_SIDES.right][Math.floor(random(0, 2))];  
+                        
+                        // Breaks from the loop if the side is not occupied
+                        if (hideaways.length == 0 || newHideawaySide != hideaways[0].getSide()) {
+                            break;
+                        }
+                    }
+
+                    // Adds the new hideaway in advance
+                    hideaways.push(new Hideaway(
+                        cameraY - 800,
+                        newHideawaySide
+                    ));
+
+                    console.log("Added new hideaway!");
+                }
             }
         }
 

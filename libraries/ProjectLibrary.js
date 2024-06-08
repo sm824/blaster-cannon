@@ -25,10 +25,13 @@ found in the top left corner of the screen during gameplay. The
 Cybirds, however, will quickly start to come down the hall after
 you in defence of their nest. They will circle and attack you,
 whether you are in motion or stationary, and you must fire bullets
-at them to defeat them. A single hit will destroy them, but they
-are many in number, so beware!`;
+at them to defeat them. Extra lives will float down the hallway
+during gameplay, and to heal you must shoot them.
+All it takes is a single hit to destroy them, but they are many in
+number, so beware!`;
 
 const EXTRA_LIFE_SIZE = 0.75;
+const WALL_STRIPES = 10;  // The number of stripes on each wall
 
 const CYBIRD_HITBOX_SIZE = 80;
 const CYBIRD_ORBIT_RANGE = 250;  // The distance at which the cybirds orbit the player
@@ -51,13 +54,19 @@ const GAMEPLAY_STATES = {
     loadingSavegame: 4,
     exportingSavegame: 5
 };
+const WALL_SIDES = {
+    left: -1,
+    right: 1
+};
 
 DAMAGE_SCREEN_TIME = 45;  // Controls how many frames after taking damage the screen fades red
 
 let playerAdvance;
+let highestAdvance;
 let cameraY;
 let player;
 let extraLives;
+let hideaways;
 let cybirds;
 let cybirdSpawnBlock;  // Controls the initial minumum frames that pass after a cybird flock spawns before more can spawn
 let currentGameState;  // Tracks if the player is viewing the menu, customize screen, or playing the game
@@ -171,6 +180,7 @@ function playGame() {
     cameraY = 0;
     extraLives = [];
     cybirds = [];
+    hideaways = [];
     cybirdSpawnBlock = 300;
 
     // Sends the player to one side horizontally, chosen randomly
@@ -283,7 +293,7 @@ function confirmReturnToMenu() {
 
     // Draws the decorative bars (top then bottom)
     fill(THEME_COLOR);
-    for (let thisBar = -1; thisBar <= 1; thisBar += 2) {
+    for (let thisBar = WALL_SIDES.left; thisBar <= WALL_SIDES.right; thisBar += 2) {
         rect(
             width / 2,
             height / 2 + 260 * thisBar,

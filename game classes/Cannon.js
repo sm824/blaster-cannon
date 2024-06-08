@@ -53,15 +53,45 @@ class Cannon {
   }
 
   /**
+   * Returns true if the cannon is overtop of a hideaway, and false
+   * otherwise
+   * 
+   * padding = how many pixels greater than the bounds of the hideaway
+   *           count as being over the hideaway
+   */
+  // isInHideaway(padding) {
+  //   for (let thisHideaway = 0; thisHideaway < hideaways.length; thisHideaway++) {
+  //     // Hides the player from cybirds, if they are overtop if the object
+  //     if (this.pos.x > hideaways[thisHideaway].pos.x - Hideaway.hideawayDeepness / 2 - padding &&
+  //       this.pos.x < hideaways[thisHideaway].pos.x + Hideaway.hideawayDeepness / 2 + padding &&
+  //       this.pos.y > hideaways[thisHideaway].pos.y - Hideaway.hideawayHeight / 2 - padding &&
+  //       this.pos.y < hideaways[thisHideaway].pos.y + Hideaway.hideawayHeight / 2 + padding
+  //     ) {
+  //       return true;
+  //     }
+  //   }
+  // }
+
+  /**
    * Begins the cannon's jump, only if it
    * permitted to jump in its current state
    */
   jump() {
 
+    // Simulates where the future position will be if the cannon jumps,
+    // to determine if they will end up in walls or not
+    let futurePos = this.pos.copy();
+    advance(futurePos, SPEED * 2, this.rotation);
+
+    // Allows the player to jump only if they are not jumping already, and
+    // are not going to jump through walls
     if (!this.isJumping &&
-      (this.pos.x < width / 2 && this.rotation > 180 ||  // Left wall
-        this.pos.x > width / 2 && this.rotation < 180  // Right wall
-      )) {
+      (
+        futurePos.x > WALL_PADDING && futurePos.x < width - WALL_PADDING ||
+        Hideaway.isInHideaway(futurePos, SPEED)
+      )
+    ) {
+
       this.isJumping = true;
       this.jumpingAngle = this.rotation;
 
@@ -92,7 +122,7 @@ class Cannon {
       circle(
         0,
         42.5,
-        30 * this.bulletCooldown * (1/60)  // Calculates the size of the cooldown circle
+        30 * this.bulletCooldown * (1 / 60)  // Calculates the size of the cooldown circle
       );
 
       pop();
@@ -116,6 +146,14 @@ class Cannon {
    */
   operateCannon() {
 
+    // Checks if the cannon is in a hideaway
+    if (Hideaway.isInHideaway(this.pos, SPEED)) {
+      this.isVisible = false;
+    }
+    else {
+      this.isVisible = true;
+    }
+
     // Checks if the cannon has just taken damage, and colors the screen to indicate if it has
     if (this.damageScreenTimer > 0) {
       this.damageScreenTimer--;
@@ -124,7 +162,7 @@ class Cannon {
         220,
         0,
         0,
-        150 - (150 - this.damageScreenTimer*(150/DAMAGE_SCREEN_TIME))
+        150 - (150 - this.damageScreenTimer * (150 / DAMAGE_SCREEN_TIME))
       );
     }
 
@@ -165,9 +203,10 @@ class Cannon {
 
       // Checks if the cannon has met a wall after its collision
       // invulnerability is up, and stops it
-      if (this.ignoreWallSteps == 0 &&
-        (this.pos.x < WALL_PADDING ||
-          this.pos.x > DIMENSIONS[0] - WALL_PADDING
+      if (this.ignoreWallSteps == 0 && !Hideaway.isInHideaway(this.pos, 0) &&
+        (
+          this.pos.x < WALL_PADDING ||
+          this.pos.x > width - WALL_PADDING
         )) {
         this.isJumping = false;
       }
@@ -197,9 +236,8 @@ class Cannon {
 
       // Checks if any bullets have hit an ExtraLife object, and heals cannon
       for (let thisLife = 0; thisLife < extraLives.length; thisLife++) {
-        console.log("current bullet: " + this.bullets[thisBullet]);
-        if (getDistance(extraLives[thisLife].pos, this.bullets[thisBullet].pos) < 40*EXTRA_LIFE_SIZE) {
-          
+        if (getDistance(extraLives[thisLife].pos, this.bullets[thisBullet].pos) < 40 * EXTRA_LIFE_SIZE) {
+
           // Restores some player health
           if (this.health < 5) {
             this.health++;

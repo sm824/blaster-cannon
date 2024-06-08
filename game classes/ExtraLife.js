@@ -1,3 +1,8 @@
+/*********************************************************************
+The class for the extra lives that spawn randomly. Most main processes
+for the objects are run by Object.monitor(), excluding the actions run
+to delete them or detect bullets, which must be run externally
+*********************************************************************/
 
 class ExtraLife {
 
@@ -30,7 +35,7 @@ class ExtraLife {
         fill(ExtraLife.heartColor);
         stroke(ExtraLife.heartColor);
         strokeWeight(1);
-        
+
         line(
             this.pos.x, this.pos.y - 15 * EXTRA_LIFE_SIZE,
             this.pos.x, this.pos.y + 30 * EXTRA_LIFE_SIZE
@@ -39,7 +44,7 @@ class ExtraLife {
         // Draws the heart (left then right sides)
         stroke("black");
         
-        for (let i = -1; i <= 1; i += 2) {
+        for (let i = WALL_SIDES.left; i <= WALL_SIDES.right; i += 2) {
             curve(
                 this.pos.x - 200 * i * EXTRA_LIFE_SIZE, this.pos.y + 175 * EXTRA_LIFE_SIZE,
                 this.pos.x, this.pos.y - 15 * EXTRA_LIFE_SIZE,

@@ -26,7 +26,7 @@ class Cybird {
         this.frame = random(60);  // Tracks the frame of the animation
         this.rotation = 0;  // In degrees
         this.orbitRotation = 0;
-        this.orbitDirection = 1;  // +1 for clockwise, -1 for counter-clockwise
+        this.orbitDirection = 1;  // +1 for clockwise, -1 for counter-clockwise (uses WALL_SIDES constant)
         this.pos = pos;
         this.targetPos = NaN;  // Equals NaN when the cybird is not fleeing, and holds a p5.Vector object when it is
 
@@ -192,10 +192,10 @@ class Cybird {
      */
     detectWall() {
         if (this.pos.x > width - WALL_PADDING) {  // Right wall
-            return -1;
+            return WALL_SIDES.left;
         }
         else if (this.pos.x < WALL_PADDING) {  // Left wall
-            return 1;
+            return WALL_SIDES.right;
         }
     }
 
@@ -220,14 +220,19 @@ class Cybird {
         this.rotation = aim(this.pos, player.pos);
         advance(this.pos, SPEED, this.rotation);  // The cybird cannot go slower than SPEED, or the player could outrun it
 
+        // Makes the cybird flee, if it is significantly closer to the player than the orbitting distance
         if (getDistance(player.pos, this.pos) < CYBIRD_ORBIT_RANGE - 50) {
             this.state = CYBIRD_STATES.fleeing;
             this.setDistantTarget();
         }
+
+        // Makes the cybird orbit, if it is near the orbitting distance
         else if (getDistance(player.pos, this.pos) < CYBIRD_ORBIT_RANGE) {
             this.state = CYBIRD_STATES.orbitting;
             this.orbitRotation = aim(player.pos, this.pos);
-            this.orbitDirection = [-1, 1][Math.floor(random(0, 2))];  // Evaluates to a 1 or -1
+
+            // Left = counter-clockwise, right = clockwise
+            this.orbitDirection = [WALL_SIDES.left, WALL_SIDES.right][Math.floor(random(0, 2))];
         }
     }
 
@@ -312,7 +317,7 @@ class Cybird {
         );
 
         // Determines if the cybird has hit a wall or a player
-        if (getDistance(this.pos, player.pos) < 40 || (this.detectWall())) {
+        if (getDistance(this.pos, player.pos) < 40 || (this.detectWall()) && !Hideaway.isInHideaway(this.pos, SPEED * 1.2)) {
 
             // Damage the player, if the cybird hit it
             if (getDistance(this.pos, player.pos) < 40) {
