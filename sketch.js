@@ -399,21 +399,9 @@ function draw() {
                     
                     hideaways[thisHideaway].monitor();
 
-                    // TEMPORARY
-                    // TEMPORARY
-                    push();
-                    translate(0, -cameraY);
-                    ellipseMode(CENTER);
-                    fill("pink");
-                    circle(hideaways[thisHideaway].pos.x, hideaways[thisHideaway].pos.y, 50);
-                    pop();
-                    // TEMPORARY
-                    // TEMPORARY
-
                     // Removes hideaways that have gone off the screen
                     if (hideaways[thisHideaway].pos.y - Hideaway.hideawayHeight/2 > cameraY + height) {
                         hideaways.splice(thisHideaway, 1);
-                        console.log("DELETING HIDEAWAY!");
                     }
                 }
 
@@ -463,6 +451,7 @@ function draw() {
                 for (let thisBird = 0; thisBird < cybirds.length; thisBird++) {
                     cybirds[thisBird].run();
 
+                    // Checks if any bullets have contacted the current cybird
                     for (let thisBullet = 0; thisBullet < player.bullets.length; thisBullet++) {
 
                         // Checks if the current bullet has met the current cybird's hitbox
@@ -475,11 +464,15 @@ function draw() {
                             cybirdDamage.play();  // This must be played here, because the cybird object just killed will be destroyed before the sound can play from it
                         }
                     }
-                }
 
-                // Checks for cybirds that were shot above, and deletes them (prevents errors that would occur if they were deleted above)
-                for (let thisBird = 0; thisBird < cybirds.length; thisBird++) {
-                    if (cybirds[thisBird].state == CYBIRD_STATES.dead) {
+                    // Deletes the current cybird, if it has left the
+                    // screen by over 200 px without detecting the player,
+                    // or was shot above by a bullet
+                    if (
+                        cybirds[thisBird].state == CYBIRD_STATES.patrolling &&
+                        cybirds[thisBird].pos.y > cameraY + height + 200 ||
+                        cybirds[thisBird].state == CYBIRD_STATES.dead
+                    ) {
                         cybirds.splice(thisBird, 1);
                     }
                 }
@@ -555,25 +548,13 @@ function draw() {
                     );
                 }
 
-                console.log("\n\nGAME INFO\nHideaways: " + hideaways.length,
-                    "\nPlayer Y: " + player.pos.y
-                );
-
-                for (let i = 0; i < hideaways.length; i++) {
-                    console.log("Hideaway #" + i + " Y: " + hideaways[i].pos.y);
-                    console.log(hideaways[i]);
-                }
-
-                console.log("player.isVisible: " + player.isVisible);
-
                 pop();
 
                 // Determines if another hideaway should spawn, which only occurs while
                 // the player is jumping. This prevents an excessive
                 // number of hideaways from spawning while the player is
                 // stationary
-                if (random(60) < 1 && player.isJumping && hideaways.length < 2) {
-                    // ^1200
+                if (random(800) < 1 && player.isJumping && hideaways.length < 2) {
 
                     // Forces the side of the new hideaway to be opposite
                     // the side of one that already exists (allows for
@@ -595,8 +576,6 @@ function draw() {
                         cameraY - 800,
                         newHideawaySide
                     ));
-
-                    console.log("Added new hideaway!");
                 }
             }
         }

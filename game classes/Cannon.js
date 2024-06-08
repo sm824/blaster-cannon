@@ -53,26 +53,6 @@ class Cannon {
   }
 
   /**
-   * Returns true if the cannon is overtop of a hideaway, and false
-   * otherwise
-   * 
-   * padding = how many pixels greater than the bounds of the hideaway
-   *           count as being over the hideaway
-   */
-  // isInHideaway(padding) {
-  //   for (let thisHideaway = 0; thisHideaway < hideaways.length; thisHideaway++) {
-  //     // Hides the player from cybirds, if they are overtop if the object
-  //     if (this.pos.x > hideaways[thisHideaway].pos.x - Hideaway.hideawayDeepness / 2 - padding &&
-  //       this.pos.x < hideaways[thisHideaway].pos.x + Hideaway.hideawayDeepness / 2 + padding &&
-  //       this.pos.y > hideaways[thisHideaway].pos.y - Hideaway.hideawayHeight / 2 - padding &&
-  //       this.pos.y < hideaways[thisHideaway].pos.y + Hideaway.hideawayHeight / 2 + padding
-  //     ) {
-  //       return true;
-  //     }
-  //   }
-  // }
-
-  /**
    * Begins the cannon's jump, only if it
    * permitted to jump in its current state
    */
@@ -128,13 +108,39 @@ class Cannon {
       pop();
     }
 
-    fill(this.colors.base);
+    // Calculates the transparency for the fill values based off of whether
+    // or not the cannon is hidden in a hideaway
+    let opacity;
+
+    if (this.isVisible) {
+      opacity = 255;  // Opaque
+    } else {
+      opacity = 100;   // Translucent (hidden)
+    }
+
+    // Draws the cannon body
+    fill(
+      red(this.colors.base),
+      green(this.colors.base),
+      blue(this.colors.base),
+      opacity
+    );
     circle(0, 0, 50); // Draws the circlular base
 
-    fill(this.colors.barrel);
-    rect(0, 25, 20, 35); // Draws the barrel
+    fill(
+      red(this.colors.barrel),
+      green(this.colors.barrel),
+      blue(this.colors.barrel),
+      opacity
+    );
+    rect(0, 32.5, 20, 22.5); // Draws the barrel
 
-    fill(this.colors.body);
+    fill(
+      red(this.colors.body),
+      green(this.colors.body),
+      blue(this.colors.body),
+      opacity
+    );
     square(0, 0, 42, 5); // Draws the body
 
     pop();

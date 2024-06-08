@@ -7,6 +7,7 @@ const SECONDARY_COLOR = [88, 97, 97];
 const BUTTON_BORDER_PADDING = 15;
 const GAME_TITLE_Y = 800;
 const DEFAULT_MENU_BTN_POS = new p5.Vector(600, 30);
+const HIDEAWAY_RARITY = 800;
 
 // Source (how to create multi-line strings in JS): https://stackoverflow.com/questions/805107/creating-multiline-strings-in-javascript
 const PLAYER_MANUAL = `--- Game Controls ---
@@ -77,7 +78,7 @@ let menuButton;
 let mouseIsPressedOnce = false;  // Tracks a mouse click for 1 frame (needed since built-in mouseIsPressed stays true when the click is held)
 
 // Cannon character color customization variables
-const DEFAULT_CANNON_COLORS = {body: "#B2A79A", barrel: "#616161", base: "grey"};
+const DEFAULT_CANNON_COLORS = {body: [178, 167, 154], barrel: [97, 97, 97], base: [128, 128, 128]};
 const COLOR_PICKER_ALIGN = 240;
 const COLOR_PICKER_DIMENSIONS = [100, 50];
 let cannonColorPickers = {body: NaN, barrel: NaN, base: NaN};
@@ -202,11 +203,12 @@ function customizeCannon() {
     player.pos.x = width / 2;
     player.pos.y = 600;
     player.rotation = 180;
+    player.isVisible = true;
 
     // creates color-pickers (used by cannon customization page)
-    cannonColorPickers.body = createColorPicker(player.colors.body);
-    cannonColorPickers.barrel = createColorPicker(player.colors.barrel);
-    cannonColorPickers.base = createColorPicker(player.colors.base);
+    cannonColorPickers.body = createColorPicker(color(player.colors.body));
+    cannonColorPickers.barrel = createColorPicker(color(player.colors.barrel));
+    cannonColorPickers.base = createColorPicker(color(player.colors.base));
 
     // Sizes the color pickers
     cannonColorPickers.body.size(...COLOR_PICKER_DIMENSIONS);
