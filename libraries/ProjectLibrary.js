@@ -173,6 +173,7 @@ function playGame() {
     player.health = 5;
     player.pos.x = width / 2;
     player.pos.y = height / 2;
+    player.damageScreenTimer = 0;
 
     currentGameState = GAMEPLAY_STATES.playing;
 
@@ -259,15 +260,7 @@ function returnToMenu() {
 
         // Sets the menuButton to perform special operations specific to
         // exiting gameplay
-        menuButton.buttonOperation = () => {
-            returnToMenu();
-            menuButton.pos = DEFAULT_MENU_BTN_POS.copy();
-            menuButton.buttonOperation = returnToMenu;
-            gameplayPaused = false;
-
-            // Stops and resets the song to its beginning
-            gameSong.stop();
-        }
+        menuButton.buttonOperation = pausedMenuOperation;
         
         return;  // Stops the function call early
     }
@@ -316,4 +309,79 @@ function confirmReturnToMenu() {
     text("You will lose your progress if you\nleave before the game is over", width / 2, height / 2 - 30);
 
     pop();
+}
+
+/**
+ * Runs in a loop after the player is killed in gameplay, to inform them
+ * they have been killed as well as if they have beat their high score
+ */
+function acknowledgeDeath() {
+    
+    push();
+
+    rectMode(CENTER);
+
+    // Draws the outer frames
+    fill(SECONDARY_COLOR);
+    square(width / 2, height / 2, 360, 90);
+
+    fill("black");
+    square(width / 2, height / 2, 350, 90);
+
+    fill(THEME_COLOR);
+    square(width / 2, height / 2, 330, 80);
+
+    fill("grey");
+    square(width / 2, height / 2, 300, 70);
+
+    // Displays the messages informing the player of their death
+    textAlign(CENTER);
+    fill("black");
+
+    // Dialog title
+    textSize(30);
+    text("Game Over", width / 2, 355);
+
+    // Draws the underline
+    fill(THEME_COLOR);
+    rect(width / 2, 365, 215, 5, 5);
+
+    // Dialog info
+    fill("black");
+
+    textSize(18);
+    text("Advance: " + Math.floor(playerAdvance), width / 2, 390);
+    text("Highest Advance: " + highestAdvance, width / 2, 420);
+
+    textSize(16);    
+    // Determines what message to give the player about their advance score
+    if (playerAdvance > highestAdvance) {
+        text("You exceeded your previous\nhighest advance!", width / 2, 460);
+    } else {
+        text("Your advance was lower than\nyour highest-ever. Better luck\nnext time.", width / 2, 460);
+    }
+
+    pop();
+
+    // Monitors the menu button
+    menuButton.monitorButton();
+}
+
+/**
+ * holds the commands that must be executed by the menu button while the
+ * gameplay is paused, and runs additional tasks given as the argument
+ */
+function pausedMenuOperation() {
+
+    // Resets and stops the gameplay song
+    gameSong.stop();
+    
+    // Calls the original button operation
+    returnToMenu();
+
+    // Resets the GUI
+    menuButton.buttonOperation = returnToMenu
+    menuButton.pos = DEFAULT_MENU_BTN_POS.copy();
+    gameplayPaused = false;
+
 }

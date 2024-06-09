@@ -211,6 +211,13 @@ function draw() {
             width / 2, GAME_TITLE_Y + 50
         );
 
+        // Displays the high score (highestAdvance)
+        textSize(24);
+        text(
+            "Highest Advance: " + highestAdvance,
+            width / 2, 245
+        );
+
         pop();
 
         // Monitors the buttons
@@ -352,8 +359,14 @@ function draw() {
         else {
 
             if (gameplayPaused) {
-                confirmReturnToMenu();
-                cancelMenuButton.monitorButton();
+
+                if (player.health <= 0) {
+                    acknowledgeDeath();
+                }
+                else {
+                    confirmReturnToMenu();
+                    cancelMenuButton.monitorButton();
+                }
             }
 
             // If gameplayPaused == false (occurs when the menu button is clicked), run the game
@@ -396,11 +409,11 @@ function draw() {
 
                 // Moniters the hideaways
                 for (let thisHideaway = 0; thisHideaway < hideaways.length; thisHideaway++) {
-                    
+
                     hideaways[thisHideaway].monitor();
 
                     // Removes hideaways that have gone off the screen
-                    if (hideaways[thisHideaway].pos.y - Hideaway.hideawayHeight/2 > cameraY + height) {
+                    if (hideaways[thisHideaway].pos.y - Hideaway.hideawayHeight / 2 > cameraY + height) {
                         hideaways.splice(thisHideaway, 1);
                     }
                 }
@@ -480,72 +493,99 @@ function draw() {
                 push();
                 translate(0, cameraY);
 
-                // Maintains the player's cannon character
-                player.operateCannon();
+                // Detects if the player has been killed
+                if (player.health <= 0) {
+                    gameplayPaused = true;
 
-                // Draws overlays containing the player's stats
-                translate(0, -cameraY);
+                    // Places the button in the dialog
+                    menuButton.pos.x = width / 2 - menuButton.dimensions.x / 2;
+                    menuButton.pos.y = 500;
 
-                // Draws the base shapes of the overlays
-                fill(...THEME_COLOR, 220);
-                rect(0, 0, 300 * UI_SCALE, 135 * UI_SCALE);  // Overlay background
-                fill("grey");
+                    // Alters the button's operation to suit a need
+                    // specific to this use
+                    menuButton.buttonOperation = () => {
+                        pausedMenuOperation();
 
-                // Draws the advance value background
-                rect(
-                    150 * UI_SCALE,
-                    45 * UI_SCALE,
-                    145 * UI_SCALE,
-                    50 * UI_SCALE
-                );
+                        // Changes the high score, if a new on is achieved
+                        highestAdvance = Math.floor(Math.max(highestAdvance, playerAdvance));
+                    }
 
-                // Draws the labels and values
-                fill("black");
-                text("Advance   " + Math.floor(playerAdvance), 10 * UI_SCALE, 80 * UI_SCALE);  // Advance label and value
-                text("Health", 10 * UI_SCALE, 35 * UI_SCALE);  // Health text label
+                    // Puts a translucent black film on the background
+                    background(0, 0, 0, 200);
+                }
 
-                // Health bar background (empty health)
-                rect(
-                    120 * UI_SCALE,
-                    10 * UI_SCALE,
-                    175 * UI_SCALE,
-                    25 * UI_SCALE,
-                    HEALTH_BAR_ROUNDNESS * UI_SCALE
-                );
+                // Maintains the player's cannon character, if they are alive
+                else {
+                    player.operateCannon();
 
-                // Cooldown bar background
-                rect(
-                    10 * UI_SCALE,
-                    105 * UI_SCALE,
-                    280 * UI_SCALE,
-                    20 * UI_SCALE,
-                    HEALTH_BAR_ROUNDNESS * UI_SCALE
-                );
+                    // Draws overlays containing the player's stats
+                    translate(0, -cameraY);
 
-                // Health bar full area
-                fill(HEALTH_COLORS[HEALTH_COLORS.length - player.health]);  // Sets the health bar to a color based off its value
-                rect(
-                    120 * UI_SCALE,
-                    10 * UI_SCALE,
-                    175 / 5 * player.health * UI_SCALE,
-                    25 * UI_SCALE,
-                    HEALTH_BAR_ROUNDNESS * UI_SCALE
-                );
+                    // Draws the base shapes of the overlays
+                    fill(...THEME_COLOR, 220);
+                    rect(0, 0, 300 * UI_SCALE, 135 * UI_SCALE);  // Overlay background
+                    fill("grey");
 
-                // Writes the value of the health bar
-                fill(THEME_COLOR);
-                textSize(15 * UI_SCALE);
-                text(player.health + " / 5", 185 * UI_SCALE, 28.5 * UI_SCALE);
+                    // Draws the advance value background
+                    rect(
+                        150 * UI_SCALE,
+                        45 * UI_SCALE,
+                        145 * UI_SCALE,
+                        50 * UI_SCALE
+                    );
 
-                // Draws the fill of the cooldown bar
-                if (player.bulletCooldown > 0) {
+                    // Draws the labels and values
+                    fill("black");
+                    text("Advance   " + Math.floor(playerAdvance), 10 * UI_SCALE, 80 * UI_SCALE);  // Advance label and value
+                    text("Health", 10 * UI_SCALE, 35 * UI_SCALE);  // Health text label
+
+                    // Displays the corner text stating the controls
+                    textSize(12);
+                    text("Press F to fire\nPress space to jump", WALL_PADDING + 8, height - 30);
+
+                    // Health bar background (empty health)
+                    rect(
+                        120 * UI_SCALE,
+                        10 * UI_SCALE,
+                        175 * UI_SCALE,
+                        25 * UI_SCALE,
+                        HEALTH_BAR_ROUNDNESS * UI_SCALE
+                    );
+
+                    // Cooldown bar background
                     rect(
                         10 * UI_SCALE,
                         105 * UI_SCALE,
-                        (280 * UI_SCALE) / 60 * player.bulletCooldown,
+                        280 * UI_SCALE,
                         20 * UI_SCALE,
                         HEALTH_BAR_ROUNDNESS * UI_SCALE
                     );
+
+                    // Health bar full area
+                    fill(HEALTH_COLORS[HEALTH_COLORS.length - player.health]);  // Sets the health bar to a color based off its value
+                    rect(
+                        120 * UI_SCALE,
+                        10 * UI_SCALE,
+                        175 / 5 * player.health * UI_SCALE,
+                        25 * UI_SCALE,
+                        HEALTH_BAR_ROUNDNESS * UI_SCALE
+                    );
+
+                    // Writes the value of the health bar
+                    fill(THEME_COLOR);
+                    textSize(15 * UI_SCALE);
+                    text(player.health + " / 5", 185 * UI_SCALE, 28.5 * UI_SCALE);
+
+                    // Draws the fill of the cooldown bar
+                    if (player.bulletCooldown > 0) {
+                        rect(
+                            10 * UI_SCALE,
+                            105 * UI_SCALE,
+                            (280 * UI_SCALE) / 60 * player.bulletCooldown,
+                            20 * UI_SCALE,
+                            HEALTH_BAR_ROUNDNESS * UI_SCALE
+                        );
+                    }
                 }
 
                 pop();
@@ -554,7 +594,7 @@ function draw() {
                 // the player is jumping. This prevents an excessive
                 // number of hideaways from spawning while the player is
                 // stationary
-                if (random(800) < 1 && player.isJumping && hideaways.length < 2) {
+                if (random(HIDEAWAY_RARITY) < 1 && player.isJumping && hideaways.length < 2) {
 
                     // Forces the side of the new hideaway to be opposite
                     // the side of one that already exists (allows for
@@ -563,8 +603,8 @@ function draw() {
                     while (true) {
 
                         // Chooses a random side
-                        newHideawaySide = [WALL_SIDES.left, WALL_SIDES.right][Math.floor(random(0, 2))];  
-                        
+                        newHideawaySide = [WALL_SIDES.left, WALL_SIDES.right][Math.floor(random(0, 2))];
+
                         // Breaks from the loop if the side is not occupied
                         if (hideaways.length == 0 || newHideawaySide != hideaways[0].getSide()) {
                             break;

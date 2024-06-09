@@ -74,7 +74,7 @@ class ExtraLife {
 
         advance(this.pos, SPEED / 2, 0);
 
-        if (this.pos.y > cameraY + height) {
+        if (this.pos.y > cameraY + height + 200) {
             this.isOffScreen = true;
         }
     }
