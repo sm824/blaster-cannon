@@ -60,12 +60,14 @@ function preload() {
     menuBG = loadImage("media/TitleScreenBG.jpg");
 
     // Loads sound media
-    cybirdDive = loadSound("media/BirdAttackSquack.mp3");
-    cannonFire = loadSound("media/CannonFire.mp3");
-    cannonDamage = loadSound("media/CannonDamage.mp3");
-    cybirdDamage = loadSound("media/BirdDamage.mp3");
+    cybirdDiveSound = loadSound("media/BirdAttackSquack.mp3");
+    cannonFireSound = loadSound("media/CannonFire.mp3");
+    cannonDamageSound = loadSound("media/CannonDamage.mp3");
+    cybirdDamageSound = loadSound("media/BirdDamage.mp3");
+    healingSound = loadSound("media/Healing.mp3");
 
     gameSong = loadSound("media/GameSong.mp3");
+    gameOutro = loadSound("media/GameOutro.mp3");
 }
 
 function keyTyped() {
@@ -431,6 +433,7 @@ function draw() {
                 // Monitors the existing extra lives
                 for (let thisLife = 0; thisLife < extraLives.length; thisLife++) {
                     extraLives[thisLife].monitor();
+
                     if (extraLives[thisLife].isOffScreen) {
                         extraLives.splice(thisLife, 1);
                     }
@@ -474,7 +477,7 @@ function draw() {
                             player.bullets[thisBullet].pos.y < cybirds[thisBird].pos.y + CYBIRD_HITBOX_SIZE / 2
                         ) {
                             cybirds[thisBird].state = CYBIRD_STATES.dead;  // State 4 marks the cybird as dead
-                            cybirdDamage.play();  // This must be played here, because the cybird object just killed will be destroyed before the sound can play from it
+                            cybirdDamageSound.play();  // This must be played here, because the cybird object just killed will be destroyed before the sound can play from it
                         }
                     }
 
@@ -512,6 +515,10 @@ function draw() {
 
                     // Puts a translucent black film on the background
                     background(0, 0, 0, 200);
+
+                    // Plays the game over song
+                    gameSong.stop();
+                    gameOutro.play();
                 }
 
                 // Maintains the player's cannon character, if they are alive

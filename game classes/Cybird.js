@@ -278,7 +278,7 @@ class Cybird {
 
             Cybird.attackCooldown = 300;
 
-            cybirdDive.play();
+            cybirdDiveSound.play();
         }
     }
 

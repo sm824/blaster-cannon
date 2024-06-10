@@ -38,7 +38,7 @@ class Cannon {
       this.bullets.push(new Bullet(this.pos.copy(), this.rotation));
       this.bulletCooldown = 60;
 
-      cannonFire.play();
+      cannonFireSound.play();
     }
   }
 
@@ -47,7 +47,7 @@ class Cannon {
    */
   takeDamage() {
     this.health--;
-    cannonDamage.play();
+    cannonDamageSound.play();
 
     this.damageScreenTimer = DAMAGE_SCREEN_TIME;
   }
@@ -243,6 +243,9 @@ class Cannon {
       // Checks if any bullets have hit an ExtraLife object, and heals cannon
       for (let thisLife = 0; thisLife < extraLives.length; thisLife++) {
         if (getDistance(extraLives[thisLife].pos, this.bullets[thisBullet].pos) < 40 * EXTRA_LIFE_SIZE) {
+
+          // Plays the sound to indicate healing
+          healingSound.play();
 
           // Restores some player health
           if (this.health < 5) {

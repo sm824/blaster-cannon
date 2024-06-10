@@ -78,18 +78,20 @@ let menuButton;
 let mouseIsPressedOnce = false;  // Tracks a mouse click for 1 frame (needed since built-in mouseIsPressed stays true when the click is held)
 
 // Cannon character color customization variables
-const DEFAULT_CANNON_COLORS = {body: [178, 167, 154], barrel: [97, 97, 97], base: [128, 128, 128]};
+const DEFAULT_CANNON_COLORS = { body: [178, 167, 154], barrel: [97, 97, 97], base: [128, 128, 128] };
 const COLOR_PICKER_ALIGN = 240;
 const COLOR_PICKER_DIMENSIONS = [100, 50];
-let cannonColorPickers = {body: NaN, barrel: NaN, base: NaN};
+let cannonColorPickers = { body: NaN, barrel: NaN, base: NaN };
 
 // Global audio media
-let cybirdDive;
-let cannonFire;
-let cannonDamage;
-let cybirdDamage;
+let cybirdDiveSound;
+let cannonFireSound;
+let cannonDamageSound;
+let cybirdDamageSound;
+let healingSound;
 
 let gameSong;
+let gameOutro;
 
 /**
      * Moves the position a distance, by the number of pixels
@@ -229,7 +231,7 @@ function customizeCannon() {
 
         returnToMenu();
         menuButton.buttonOperation = returnToMenu;
-    }
+    };
 }
 
 /**
@@ -256,16 +258,21 @@ function returnToMenu() {
     if (currentGameState == GAMEPLAY_STATES.playing && !gameplayPaused) {
         gameplayPaused = true;
         menuButton.pos.x = width / 2 - 165;
-        menuButton.pos.y = height / 2 + 50
+        menuButton.pos.y = height / 2 + 50;
 
         // Sets the menuButton to perform special operations specific to
         // exiting gameplay
-        menuButton.buttonOperation = pausedMenuOperation;
-        
+        menuButton.buttonOperation = () => {
+            pausedMenuOperation();
+
+            // Resets and stops the gameplay song
+            gameSong.stop();
+        };
+
         return;  // Stops the function call early
     }
 
-    currentGameState = GAMEPLAY_STATES.menu;    
+    currentGameState = GAMEPLAY_STATES.menu;
 }
 
 /**
@@ -273,7 +280,7 @@ function returnToMenu() {
  * to return now, and confirms they want to quit anyway.
  * Note: Must be run in a loop
  */
-function confirmReturnToMenu() {    
+function confirmReturnToMenu() {
 
     // Draws the dialog background
     push();
@@ -316,7 +323,7 @@ function confirmReturnToMenu() {
  * they have been killed as well as if they have beat their high score
  */
 function acknowledgeDeath() {
-    
+
     push();
 
     rectMode(CENTER);
@@ -353,7 +360,7 @@ function acknowledgeDeath() {
     text("Advance: " + Math.floor(playerAdvance), width / 2, 390);
     text("Highest Advance: " + highestAdvance, width / 2, 420);
 
-    textSize(16);    
+    textSize(16);
     // Determines what message to give the player about their advance score
     if (playerAdvance > highestAdvance) {
         text("You exceeded your previous\nhighest advance!", width / 2, 460);
@@ -373,14 +380,11 @@ function acknowledgeDeath() {
  */
 function pausedMenuOperation() {
 
-    // Resets and stops the gameplay song
-    gameSong.stop();
-    
     // Calls the original button operation
     returnToMenu();
 
     // Resets the GUI
-    menuButton.buttonOperation = returnToMenu
+    menuButton.buttonOperation = returnToMenu;
     menuButton.pos = DEFAULT_MENU_BTN_POS.copy();
     gameplayPaused = false;
 
