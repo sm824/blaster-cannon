@@ -334,6 +334,60 @@ class Cybird {
     }
 
     /**
+     * Plays the explosion animation, called after the cybird is shot.
+     * Must be called in a loop.
+     */
+    explode() {
+
+        console.log("Exploding!");
+
+        // Manages the frames
+        this.frame++;
+
+        if (this.frame >= CYBIRD_EXPLOSION_DURATION) {
+            this.state = CYBIRD_STATES.dead;
+        }
+
+        // Draws the explosion
+        push();
+        translate(0, -cameraY);
+        translate(this.pos.x, this.pos.y);
+        fill(232, 122, 37, 180 - this.frame * (180 / CYBIRD_EXPLOSION_DURATION));
+        ellipseMode(CENTER);
+
+        // Draws the translucent explosion background
+        noStroke();
+        circle(
+            0,
+            0,
+            (this.frame + (CYBIRD_EXPLOSION_DURATION ** 2 - this.frame ** 2) / 100) * 2
+        );
+
+        // Draws the object in the explosion
+        rotate(this.rotation);
+        strokeWeight(1);
+
+        stroke(0, 0, 0, 255 - this.frame * (255 / CYBIRD_EXPLOSION_DURATION));
+
+        colorMode(HSL);
+        fill(  // Results in a darker, duller color futher into the animation
+            this.color1[0],
+            this.color1[1] - this.frame,
+            this.color1[2]  - this.frame
+        );
+        rectMode(CENTER);
+
+        square(
+            0,
+            0,
+            25 - this.frame * 0.45,
+            this.frame
+        );
+
+        pop();
+    }
+
+    /**
      * Returns a position for the cybird to flee to that is away from the
      * player currently
      */
@@ -359,18 +413,26 @@ class Cybird {
      * Runs all the necessary operations for the cybird to work
      */
     run() {
-        this.animate();
 
-        if (this.state == CYBIRD_STATES.patrolling) {
-            this.patrol();
-        } else if (this.state == CYBIRD_STATES.chasing) {
-            this.chase();
-        } else if (this.state == CYBIRD_STATES.orbitting) {
-            this.orbit();
-        } else if (this.state == CYBIRD_STATES.fleeing) {
-            this.flee();
-        } else if (this.state == CYBIRD_STATES.attacking) {
-            this.attack();
+        if (this.state < CYBIRD_STATES.exploding) {
+
+            this.animate();
+
+            if (this.state == CYBIRD_STATES.patrolling) {
+                this.patrol();
+            } else if (this.state == CYBIRD_STATES.chasing) {
+                this.chase();
+            } else if (this.state == CYBIRD_STATES.orbitting) {
+                this.orbit();
+            } else if (this.state == CYBIRD_STATES.fleeing) {
+                this.flee();
+            } else if (this.state == CYBIRD_STATES.attacking) {
+                this.attack();
+            }
+        }
+        
+        else if (this.state == CYBIRD_STATES.exploding) {
+            this.explode();
         }
     }
 }

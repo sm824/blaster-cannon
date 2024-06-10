@@ -471,13 +471,18 @@ function draw() {
                     for (let thisBullet = 0; thisBullet < player.bullets.length; thisBullet++) {
 
                         // Checks if the current bullet has met the current cybird's hitbox
-                        if (player.bullets[thisBullet].pos.x > cybirds[thisBird].pos.x - CYBIRD_HITBOX_SIZE / 2 &&
+                        if (
+                            cybirds[thisBird].state < CYBIRD_STATES.exploding &&
+                            player.bullets[thisBullet].pos.x > cybirds[thisBird].pos.x - CYBIRD_HITBOX_SIZE / 2 &&
                             player.bullets[thisBullet].pos.x < cybirds[thisBird].pos.x + CYBIRD_HITBOX_SIZE / 2 &&
                             player.bullets[thisBullet].pos.y > cybirds[thisBird].pos.y - CYBIRD_HITBOX_SIZE / 2 &&
                             player.bullets[thisBullet].pos.y < cybirds[thisBird].pos.y + CYBIRD_HITBOX_SIZE / 2
                         ) {
-                            cybirds[thisBird].state = CYBIRD_STATES.dead;  // State 4 marks the cybird as dead
-                            cybirdDamageSound.play();  // This must be played here, because the cybird object just killed will be destroyed before the sound can play from it
+                            cybirds[thisBird].state = CYBIRD_STATES.exploding;
+
+                            // Runs the actions that must be performed to prepare for the explosion
+                            cybirdDamageSound.play();
+                            cybirds[thisBird].frame = 0;
                         }
                     }
 
