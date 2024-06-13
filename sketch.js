@@ -349,19 +349,12 @@ function draw() {
             pop();
         }
 
-        else if (currentGameState == GAMEPLAY_STATES.loadingSavegame) {
-            //
-        }
-
-        else if (currentGameState == GAMEPLAY_STATES.exportingSavegame) {
-            //
-        }
-
         // Runs the game if the player is playing it (not the menu or anything else)
         else {
 
             if (gameplayPaused) {
 
+                // Runs the corrent actions if the player is dead or paused
                 if (player.health <= 0) {
                     acknowledgeDeath();
                 }

@@ -339,8 +339,6 @@ class Cybird {
      */
     explode() {
 
-        console.log("Exploding!");
-
         // Manages the frames
         this.frame++;
 
@@ -355,7 +353,9 @@ class Cybird {
         fill(232, 122, 37, 180 - this.frame * (180 / CYBIRD_EXPLOSION_DURATION));
         ellipseMode(CENTER);
 
-        // Draws the translucent explosion background
+        // Draws the translucent explosion background, which expands
+        // faster near the start of the animation and slows down towards
+        // the end
         noStroke();
         circle(
             0,

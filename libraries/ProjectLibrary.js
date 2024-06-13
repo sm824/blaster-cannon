@@ -54,8 +54,6 @@ const GAMEPLAY_STATES = {
     menu: 1,
     customizing: 2,
     displayingManual: 3,
-    loadingSavegame: 4,
-    exportingSavegame: 5
 };
 const WALL_SIDES = {
     left: -1,
@@ -72,7 +70,7 @@ let extraLives;
 let hideaways;
 let cybirds;
 let cybirdSpawnBlock;  // Controls the initial minumum frames that pass after a cybird flock spawns before more can spawn
-let currentGameState;  // Tracks if the player is viewing the menu, customize screen, or playing the game
+let currentGameState;  // Tracks if the player is viewing the menu, customizing their character, or playing the game
 
 let gameplayPaused = false;
 let cancelMenuButton;
@@ -80,7 +78,11 @@ let menuButton;
 let mouseIsPressedOnce = false;  // Tracks a mouse click for 1 frame (needed since built-in mouseIsPressed stays true when the click is held)
 
 // Cannon character color customization variables
-const DEFAULT_CANNON_COLORS = { body: [178, 167, 154], barrel: [97, 97, 97], base: [128, 128, 128] };
+const DEFAULT_CANNON_COLORS = {
+    body: [178, 167, 154],
+    barrel: [97, 97, 97],
+    base: [128, 128, 128]
+};
 const COLOR_PICKER_ALIGN = 240;
 const COLOR_PICKER_DIMENSIONS = [100, 50];
 let cannonColorPickers = { body: NaN, barrel: NaN, base: NaN };
@@ -169,6 +171,24 @@ function getDistance(pos1, pos2) {
 }
 
 /**
+ * Coverts an unit RGB color (values 0-1) into a standard RGB color (0-255)
+ * Note that the color must be given as an array order red, green, blue,
+ * NOT a color object
+ * 
+ * arrayRGB = the array of 0-1 primary color values which is to be changed
+ *            into an array of 0-255 color values
+ */
+function convertUnitRGBToStandard(arrayRGB) {
+
+    // Multiplies the red, green, and blue values by 255
+    for (let thisValue = 0; thisValue < arrayRGB.length; thisValue++) {
+        arrayRGB[thisValue] *= 255;
+    }
+
+    return arrayRGB;
+}
+
+/**
  * Sets up global variables and other components required for the
  * game to play
  */
@@ -240,14 +260,45 @@ function customizeCannon() {
  * Sets up the program to load a JSON file
  */
 function loadSavegame() {
-    currentGameState = GAMEPLAY_STATES.loadingSavegame;
+    //
 }
 
 /**
- * Sets up the program to export a savegame JSON file
+ * Exports a savegame as a JSON file, which can be loaded into the game
+ * 
  */
 function exportSavegame() {
-    currentGameState = GAMEPLAY_STATES.exportingSavegame;
+
+    let savegameObject = {
+        "playerColors": player.colors,
+        "highestAdvance": highestAdvance
+    };
+
+    // Ensures the player's colors are formatted as RGB arrays out of 255
+    if (!Array.isArray(player.colors.body)) {
+
+        // Retrieves the array part of the color objects
+        savegameObject.playerColors.body = savegameObject.playerColors.body._array;
+        savegameObject.playerColors.barrel = savegameObject.playerColors.barrel._array;
+        savegameObject.playerColors.base = savegameObject.playerColors.base._array;
+
+        // Removes the opacity value from the end
+        savegameObject.playerColors.body.splice(3, 1);
+        savegameObject.playerColors.barrel.splice(3, 1);
+        savegameObject.playerColors.base.splice(3, 1);
+
+        // Converts the 0-1 values to 0-255
+        convertUnitRGBToStandard(savegameObject.playerColors.body);
+        convertUnitRGBToStandard(savegameObject.playerColors.barrel);
+        convertUnitRGBToStandard(savegameObject.playerColors.base);
+    }
+
+    // Exports the savegame
+    saveJSON(
+        savegameObject,
+        "blasterCannonSavegame.json",
+        true
+    );
 }
 
 /**
