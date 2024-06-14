@@ -87,8 +87,10 @@ class Cannon {
   display() {
     push();
 
-    translate(this.pos.x, this.pos.y);
-    translateToScreen();
+    translate(
+      this.pos.x,
+      -(2 * cameraY) + this.pos.y
+    );
     rotate(this.rotation);
 
     // Draws the cooldown indicator on the cannon barrel, if required
