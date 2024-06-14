@@ -173,6 +173,10 @@ function setup() {
 
 function draw() {
 
+    console.log("\n\n\n\n\nMenu Button:\n" + menuButton.buttonOperation);
+
+    console.log("gameplayPaused: " + gameplayPaused + "\ngame state: " + currentGameState);
+
     if (currentGameState == GAMEPLAY_STATES.menu) {
 
         // Draws the title screen background
@@ -336,6 +340,50 @@ function draw() {
             pop();
         }
 
+        else if (currentGameState == GAMEPLAY_STATES.importingSavegame) {
+            background(SECONDARY_COLOR);
+
+            push();
+            rectMode(CENTER);
+
+            // Draws the page border
+            fill(THEME_COLOR);
+            rect(
+                width / 2, height / 2,
+                width - 10, height - 10,
+                45
+            );
+
+            fill("black");
+            rect(
+                width / 2, height / 2,
+                width - 50, height - 50,
+                35
+            );
+
+            fill("grey");
+            rect(
+                width / 2, height / 2,
+                width - 60, height - 60,
+                35
+            );
+
+            fill("black");
+            rect(
+                width / 2, height / 2,
+                width - 75, height - 75,
+                35
+            );
+
+            pop();
+
+            // Keeps the file picker centered
+            savegameFileChooser.position(
+                window.innerWidth / 2,
+                window.innerHeight / 2,
+            );
+        }
+
         // Runs the game if the player is playing it (not the menu or anything else)
         else {
 
@@ -484,6 +532,7 @@ function draw() {
                 // Detects if the player has been killed
                 if (player.health <= 0) {
                     gameplayPaused = true;
+                    console.log("Game paused by player death");
 
                     // Places the button in the dialog
                     menuButton.pos.x = width / 2 - menuButton.dimensions.x / 2;

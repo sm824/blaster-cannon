@@ -54,6 +54,7 @@ const GAMEPLAY_STATES = {
     menu: 1,
     customizing: 2,
     displayingManual: 3,
+    importingSavegame: 4
 };
 const WALL_SIDES = {
     left: -1,
@@ -73,6 +74,8 @@ let cybirdSpawnBlock;  // Controls the initial minumum frames that pass after a 
 let currentGameState;  // Tracks if the player is viewing the menu, customizing their character, or playing the game
 
 let gameplayPaused = false;
+let savegameFileChooser;
+let savegameJSON;
 let cancelMenuButton;
 let menuButton;
 let mouseIsPressedOnce = false;  // Tracks a mouse click for 1 frame (needed since built-in mouseIsPressed stays true when the click is held)
@@ -194,10 +197,13 @@ function convertUnitRGBToStandard(arrayRGB) {
  */
 function playGame() {
 
+    // Resets the player attributes
     player.health = 5;
     player.pos.x = width / 2;
     player.pos.y = height / 2;
     player.damageScreenTimer = 0;
+    player.bullets = [];
+    player.bulletCooldown = 0;
 
     currentGameState = GAMEPLAY_STATES.playing;
 
@@ -258,15 +264,38 @@ function customizeCannon() {
 }
 
 /**
- * Sets up the program to load a JSON file
+ * Sets up the program to load a JSON file of the user's choosing
  */
 function loadSavegame() {
-    //
+    currentGameState = GAMEPLAY_STATES.importingSavegame;
+
+    // Loads the savegame's JSON data file picker
+    // Source: https://www.geeksforgeeks.org/p5-js-createfileinput-function/
+    savegameFileChooser = createFileInput(saveFile => {
+        savegameJSON = JSON.parse(JSON.stringify(saveFile)).data;
+
+        // Sets the game attributes to match the savegame's
+        highestAdvance = savegameJSON.highestAdvance;
+        player.colors = savegameJSON.playerColors;
+
+        // Resets the user back to the menu screen
+        savegameJSON = undefined;
+        currentGameState = GAMEPLAY_STATES.menu;
+        savegameFileChooser.remove();  // Removes the file chooser
+    },
+        false
+    );
+
+    // Sets up the back-to-menu button to do additional actions
+    // specific to this page
+    menuButton.buttonOperation = () => {
+        savegameFileChooser.remove();  // Removes the file chooser
+        returnToMenu();
+    };
 }
 
 /**
  * Exports a savegame as a JSON file, which can be loaded into the game
- * 
  */
 function exportSavegame() {
 
@@ -312,6 +341,7 @@ function returnToMenu() {
     // If the player has clicked the menu button from the game, move the
     // button onto the confirmation dialog
     if (currentGameState == GAMEPLAY_STATES.playing && !gameplayPaused) {
+        console.log("Game paused by player pausing");
         gameplayPaused = true;
         menuButton.pos.x = width / 2 - 165;
         menuButton.pos.y = height / 2 + 50;
@@ -421,7 +451,7 @@ function acknowledgeDeath() {
     if (playerAdvance > highestAdvance) {
         text("You exceeded your previous\nhighest advance!", width / 2, 460);
     } else {
-        text("Your advance was lower than\nyour highest-ever. Better luck\nnext time.", width / 2, 460);
+        text("Your advance was lower than\nyour highest-ever. Better luck\nnext time.", width / 2, 440);
     }
 
     pop();
@@ -444,4 +474,5 @@ function pausedMenuOperation() {
     menuButton.pos = DEFAULT_MENU_BTN_POS.copy();
     gameplayPaused = false;
 
+    console.log("\n\ngameplay un-paused by exiting of game\n\n");
 }
