@@ -83,7 +83,7 @@ const DEFAULT_CANNON_COLORS = {
     barrel: [97, 97, 97],
     base: [128, 128, 128]
 };
-const COLOR_PICKER_ALIGN = 240;
+const COLOR_PICKER_ALIGN = 200;
 const COLOR_PICKER_DIMENSIONS = [100, 50];
 let cannonColorPickers = { body: NaN, barrel: NaN, base: NaN };
 
@@ -229,6 +229,7 @@ function customizeCannon() {
     player.pos.y = 600;
     player.rotation = 180;
     player.isVisible = true;
+    player.bulletCooldown = 0;
 
     // creates color-pickers (used by cannon customization page)
     cannonColorPickers.body = createColorPicker(color(player.colors.body));
@@ -275,6 +276,7 @@ function exportSavegame() {
     };
 
     // Ensures the player's colors are formatted as RGB arrays out of 255
+    // Source for .isArray(): https://www.w3schools.com/jsref/jsref_isarray.asp#:~:text=JavaScript%20Array.isArray()&text=The%20isArray()%20method%20returns,is%20an%20array%2C%20otherwise%20false%20.
     if (!Array.isArray(player.colors.body)) {
 
         // Retrieves the array part of the color objects
@@ -294,6 +296,7 @@ function exportSavegame() {
     }
 
     // Exports the savegame
+    // Source for saveJSON(): https://p5js.org/reference/#/p5/saveJSON
     saveJSON(
         savegameObject,
         "blasterCannonSavegame.json",

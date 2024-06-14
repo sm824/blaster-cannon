@@ -7,8 +7,8 @@ Title: Blaster Cannon - Bane of the Cybirds
 Purpose: Runs a game in which the user plays as a cannon able to leap
          from walls, in which they must shoot down cyborg bird enemies
 
-CREDITS: Original music made with https://www.beepbox.co - https://www.beepbox.co/#9n31sbk0l00e0jt2Qa7g0jj07r1i0o452T7v1u70f40p61770q72f5q0E21990l65d06HT-SRJJJJIAAAAAh0IaE1c11T7v2u71f50p61770q72d42g3q0F21a90k762d06HT-SRJJJJIAAAAAh0IaE1c11T1v1uebf0q8y10ob23d08A9F6B9Q0681Pd756E3b862c632T4v2uf0f0q011z6666ji8k8k3jSBKSJJAArriiiiii07JCABrzrrrrrrr00YrkqHrsrrrrjr005zrAqzrjzrrqr1jRjrqGGrrzsrsA099ijrABJJJIAzrrtirqrqjqixzsrAjrqjiqaqqysttAJqjikikrizrHtBJJAzArzrIsRCITKSS099ijrAJS____Qg99habbCAYrDzh00E0b000000054AcigM004AcigRpU4AcigN934Ac0000000000x4h008h4gp246KrQvF99x4Amlhioh74LjnXwBZ1uHGuKLSg1f7MyCzQhjhZ99dvFli5darnYWhFbrGAaqtXE2hR6GKCDm3F8AJKGgFFTKaJwzE8QOY5d1yX1BPzVczS8aAzjpvcU_A3gHieAzGCL1At170Ml97iVILF7Wq_xhhhhhhhx55555556o555555564kkkkkkkjbjhYCngnV2CnHzkCzUjnUgIQpS4Qp6jd5RlApcQllmhAPhllp6jd5jFQRU2nFGi4Ow41l8kw0
-         Other audio recorded with Audacity
+CREDITS: Original music made with https://www.beepbox.co
+         Other audio recorded and edited with Audacity
          Main font taken from Google Fonts: https://fonts.google.com/specimen/Orbitron?query=orbitron
          Menu background (media/TitleScreen.jpg) made using Clip Studio Paint
 *********************************************************************/
@@ -40,9 +40,6 @@ let menuButtons = {
     loadSavegame: NaN,
     exportSavegame: NaN
 };
-
-// Controls how must the color pickers' positions are offset for the cannon color customization page
-let colorPickerPosOffset;
 
 /**
  * Sets the global mouse click variable to true for 1 frame. This is used
@@ -278,20 +275,10 @@ function draw() {
                 cannonColorPickers.base.position().y + textSize()
             );
 
-            // Calculates how the color pickers must be offset on the
-            // webpage to appear as if they are on the canvas regardless
-            // of the browser window dimensions
-            if (width < windowWidth) {
-                colorPickerPosOffset = (windowWidth % width) / 2;
-            } else {
-                colorPickerPosOffset = -(width % windowWidth) / 2;
-            }
-
             // Keeps the color pickers' position proper
-            cannonColorPickers.body.position(COLOR_PICKER_ALIGN + colorPickerPosOffset, 150);
-            cannonColorPickers.barrel.position(COLOR_PICKER_ALIGN + colorPickerPosOffset, 225);
-            cannonColorPickers.base.position(COLOR_PICKER_ALIGN + colorPickerPosOffset, 300);
-
+            cannonColorPickers.body.position(window.innerWidth / 2 - COLOR_PICKER_ALIGN, 150);
+            cannonColorPickers.barrel.position(window.innerWidth / 2 - COLOR_PICKER_ALIGN, 225);
+            cannonColorPickers.base.position(window.innerWidth / 2 - COLOR_PICKER_ALIGN, 300);
 
             // Applies the entered color to the cannon
             player.colors.body = cannonColorPickers.body.color();

@@ -120,19 +120,25 @@ class Cannon {
 
     // Draws the cannon body
     fill(
-      this.colors.base,
+      red(this.colors.base),
+      green(this.colors.base),
+      blue(this.colors.base),
       opacity
     );
     circle(0, 0, 50); // Draws the circlular base
 
     fill(
-      this.colors.barrel,
+      red(this.colors.barrel),
+      green(this.colors.barrel),
+      blue(this.colors.barrel),
       opacity
     );
     rect(0, 32.5, 20, 22.5); // Draws the barrel
 
     fill(
-      this.colors.body,
+      red(this.colors.body),
+      green(this.colors.body),
+      blue(this.colors.body),
       opacity
     );
     square(0, 0, 42, 5); // Draws the body
