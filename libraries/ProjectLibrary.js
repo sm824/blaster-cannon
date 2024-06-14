@@ -19,17 +19,16 @@ Space Bar: Jump in the direction you face. This is the cannon's
 
 --- Objective Instructions ---
 When the game begins, your cannon character will fly towards a
-random side of the hallway. Your goal in the game is to advance as
-far as possible upwards, deeper into the nest of the Cybirds. This
-value, which functions as a score, is called "Advance", and can be
-found in the top left corner of the screen during gameplay. The
-Cybirds, however, will quickly start to come down the hall after
-you in defence of their nest. They will circle and attack you,
-whether you are in motion or stationary, and you must fire bullets
-at them to defeat them. Extra lives will float down the hallway
-during gameplay, and to heal you must shoot them.
-All it takes is a single hit to destroy them, but they are many in
-number, so beware!`;
+random side of the hallway. Extra lives will float down the hallway
+during gameplay, and to heal you must shoot them. Your goal in the
+game is to advance as far as possible upwards, deeper into the nest
+of the Cybirds. This value, which functions as a score, is called
+"Advance", and can be found in the top left corner of the screen
+during gameplay. The Cybirds, however, will quickly start to come
+down the hall after you in defence of their nest. They will circle
+and attack you, whether you are in motion or stationary, and you
+must fire bullets at them to defeat them. All it takes is a single
+hit to destroy them, but they are many in number, so beware!`;
 
 const EXTRA_LIFE_SIZE = 0.75;
 const WALL_STRIPES = 10;  // The number of stripes on each wall
@@ -284,7 +283,7 @@ function loadSavegame() {
         savegameFileChooser.remove();  // Removes the file chooser
     },
         false
-    );
+    );    
 
     // Sets up the back-to-menu button to do additional actions
     // specific to this page
@@ -341,7 +340,7 @@ function returnToMenu() {
     // If the player has clicked the menu button from the game, move the
     // button onto the confirmation dialog
     if (currentGameState == GAMEPLAY_STATES.playing && !gameplayPaused) {
-        console.log("Game paused by player pausing");
+
         gameplayPaused = true;
         menuButton.pos.x = width / 2 - 165;
         menuButton.pos.y = height / 2 + 50;
@@ -473,6 +472,4 @@ function pausedMenuOperation() {
     menuButton.buttonOperation = returnToMenu;
     menuButton.pos = DEFAULT_MENU_BTN_POS.copy();
     gameplayPaused = false;
-
-    console.log("\n\ngameplay un-paused by exiting of game\n\n");
 }
