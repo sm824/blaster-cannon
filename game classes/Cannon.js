@@ -155,7 +155,7 @@ class Cannon {
   operateCannon() {
 
     // Checks if the cannon is in a hideaway
-    if (Hideaway.isInHideaway(this.pos, SPEED)) {
+    if (Hideaway.isInHideaway(this.pos, SPEED * 2.25)) {
       this.isVisible = false;
     }
     else {
