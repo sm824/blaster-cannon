@@ -24,6 +24,10 @@ class BlasterCannonButton {
         }
     }
 
+    /**
+     * Displays the button. Draws a red overlay over it if the user's
+     * cursor is over the button.
+     */
     drawButton() {
 
         push();

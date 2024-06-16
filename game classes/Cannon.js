@@ -9,8 +9,6 @@ events, which are found in keyTyped() of sketch.js
 class Cannon {
   /**
    * pos = the p5.Vector position of this cannon
-   * color1 = the color for the body of this cannon
-   * color2 = the color for the barrel of this cannon
    */
   constructor(pos) {
     this.pos = pos;

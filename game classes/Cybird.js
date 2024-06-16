@@ -17,11 +17,6 @@ class Cybird {
      */
     constructor(pos) {
         this.state = CYBIRD_STATES.patrolling;  // Determines what this cybird's current action is (see CYBIRD_STATES declaration in ProjectLibrary.js)
-        // ^States:     - 0: flying down hall
-        //              - 1: following player
-        //              - 2: orbitting player
-        //              - 3: diving (attacking)
-        //              - 4: Dead (has been shot)
 
         this.frame = random(60);  // Tracks the frame of the animation
         this.rotation = 0;  // In degrees
@@ -187,8 +182,8 @@ class Cybird {
     }
 
     /**
-     * Returns 1 if the cybird is touching/in the left wall, and -1 if it
-     * is in the other. Returns NaN if it touches neither
+     * Returns -1 if the cybird is touching/in the left wall, and +1 if it
+     * is in the other. Returns undefined if it touches neither
      */
     detectWall() {
         if (this.pos.x > width - WALL_PADDING) {  // Right wall
@@ -255,12 +250,11 @@ class Cybird {
             if (this.detectWall()) {
 
                 this.state = CYBIRD_STATES.fleeing;
-
                 this.setDistantTarget();
             }
         }
         else {
-            this.orbitRotation += this.orbitDirection;  // Orbits the cybird
+            this.orbitRotation += this.orbitDirection;  // Orbits the cybird around the player
 
             // Moves the cybird to match the calculated orbit
             this.pos = player.pos.copy();
@@ -418,6 +412,7 @@ class Cybird {
 
             this.animate();
 
+            // Runs the cybird's behaviour
             if (this.state == CYBIRD_STATES.patrolling) {
                 this.patrol();
             } else if (this.state == CYBIRD_STATES.chasing) {

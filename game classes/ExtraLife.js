@@ -72,8 +72,10 @@ class ExtraLife {
 
         this.display();
 
+        // Moves the object forwards
         advance(this.pos, SPEED / 2, 0);
 
+        // Determines if the object should be marked as being off the visible screen
         if (this.pos.y > cameraY + height + 200) {
             this.isOffScreen = true;
         }
